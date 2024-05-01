@@ -2,14 +2,16 @@ import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import { TransportOptions } from 'nodemailer';
 import User from '../models/User';
 import UserOTPVerification from '../models/UserOtpVerification';
 
 const router = express.Router();
 
 // Register a new user
-export const registerUser = async (req: Request, res: Response) => {
+router.post('/register', async (req: Request, res: Response) => {
   try {
+    console.log("handle register")
     const { username, email, password }: { username: string, email: string, password: string } = req.body;
 
     // Check if the user already exists
@@ -30,7 +32,7 @@ export const registerUser = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
-};
+});
 
 // Login a user
 export const loginUser = async (req: Request, res: Response) => {
@@ -84,7 +86,7 @@ let transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: true,
   },
-});
+}as TransportOptions);
 
 // send otp verification email
 const sendOTPVerificationEmail = async ({ _id, email }: { _id: string, email: string }, res: Response) => {
@@ -121,9 +123,10 @@ const sendOTPVerificationEmail = async ({ _id, email }: { _id: string, email: st
       },
     });
   } catch (error) {
+    const err = error as Error; 
     res.json({
       status: "FAILED",
-      message: error.message,
+      message: err.message,
     });
   }
 };
@@ -169,9 +172,10 @@ router.post("/verifyOTP", async (req: Request, res: Response) => {
       }
     }
   } catch (error) {
+    const err = error as Error; 
     res.json({
       status: "FAILED",
-      message: error.message,
+      message: err.message,
     });
   }
 });

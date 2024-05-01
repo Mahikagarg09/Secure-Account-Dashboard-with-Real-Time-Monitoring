@@ -39,7 +39,7 @@ const userSchema = new Schema<IUser>({
       default: Date.now
     }
   }]
-},{ collection: 'secure-dashboard' });
+});
 
 // Compile model from schema
 const User = mongoose.model<IUser>('User', userSchema);
