@@ -11,7 +11,6 @@ const router = express.Router();
 // Register a new user
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    console.log("handle register")
     const { username, email, password }: { username: string, email: string, password: string } = req.body;
 
     // Check if the user already exists
@@ -25,7 +24,16 @@ router.post('/register', async (req: Request, res: Response) => {
 
     // Create a new user
     const newUser = new User({ username, email, password: hashedPassword });
-    await newUser.save();
+    await newUser.save()
+    .then((result) => {
+      sendOTPVerificationEmail(result, res)
+  }).catch((err) => {
+      console.log(err);
+      res.json({
+          status: "FAILED",
+          message: "An error occured while saving user account!"
+      })
+  })
 
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
@@ -72,62 +80,61 @@ export const logoutUser = async (req: Request, res: Response) => {
   }
 };
 
-// Enable two-factor authentication
 let transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
   port: 465,
   secure: true,
-  logger: true,
-  secureConnection: false,
+  service : 'Gmail',
+  
   auth: {
     user: process.env.EMAIL as string,
     pass: process.env.PASSWORD as string,
   },
-  tls: {
-    rejectUnauthorized: true,
-  },
-}as TransportOptions);
+  
+});
 
-// send otp verification email
-const sendOTPVerificationEmail = async ({ _id, email }: { _id: string, email: string }, res: Response) => {
+const sendOTPVerificationEmail = async ({ _id, email }: { _id: string, email: string }, res: Response): Promise<void> => {
   try {
-    const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
-    // mail options
-    const mailOptions = {
-      from: process.env.EMAIL as string,
-      to: email,
-      subject: "Verify Your Email",
-      html: `<div>
-            <h5>Welcome to Oruphones
-            <p>Enter the given <b>${otp}</b>in the app to verify your email adress and complete registration process
-            <p>This code <b>expires in 1 hour</b></p>
-            </div>`
-    };
-    // hash the otp
-    const hashedOTP = await bcrypt.hash(otp, 10);
-    const newOTPVerification = await new UserOTPVerification({
-      userId: _id,
-      otp: hashedOTP,
-      createdAt: Date.now(),
-      expiresAt: Date.now() + 3600000,
-    });
-    // save the otp record
-    await newOTPVerification.save();
-    await transporter.sendMail(mailOptions);
-    res.json({
-      status: "PENDING",
-      message: "Verification OTP Email sent",
-      data: {
-        userId: _id,
-        email,
-      },
-    });
+      const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
+      // mail options
+      console.log(_id);
+      console.log(email)
+      const mailOptions = {
+          from: process.env.EMAIL,
+          to: email,
+          subject: "Verify Your Email",
+          html: `<div>
+          <h5>Welcome to Oruphones
+          <p>Enter the given <b>${otp}</b>in the app to verify your email adress and complete registration process
+          <p>This code <b>expires in 1 hour</b></p>
+          </div>`
+      };
+      // hash the otp
+      const hashedOTP = await bcrypt.hash(otp,10);
+      const newOTPVerification = await new UserOTPVerification({
+          userId: _id,
+          otp: hashedOTP,
+          createdAt: Date.now(),
+          expiresAt: Date.now() + 3600000,
+      });
+      // save the otp record
+      await newOTPVerification.save();
+      console.log("its saved")
+      await transporter.sendMail(mailOptions);
+      console.log("sent")
+      res.json({
+          status: "PENDING",
+          message: "Verification OTP Email sent",
+          data: {
+              userId: _id,
+              email,
+          },
+      });
   } catch (error) {
-    const err = error as Error; 
-    res.json({
-      status: "FAILED",
-      message: err.message,
-    });
+      res.json({
+          status: "FAILED",
+          message: (error as Error).message,
+      });
   }
 };
 
