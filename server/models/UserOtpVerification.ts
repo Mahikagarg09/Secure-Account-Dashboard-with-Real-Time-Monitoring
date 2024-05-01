@@ -12,7 +12,7 @@ const UserOTPVerificationSchema: Schema<IUserOTPVerification> = new Schema({
   otp: String,
   createdAt: Date,
   expiresAt: Date,
-});
+},{ collection: 'secure-dashboard' });
 
 const UserOTPVerification = mongoose.model<IUserOTPVerification>(
   "UserOTPVerification",
