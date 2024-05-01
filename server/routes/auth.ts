@@ -28,15 +28,15 @@ router.post('/register', async (req: Request, res: Response) => {
     // Create a new user
     const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save()
-    .then((result) => {
-      sendOTPVerificationEmail(result, res)
-  }).catch((err) => {
-      console.log(err);
-      res.json({
-          status: "FAILED",
-          message: "An error occured while saving user account!"
-      })
-  })
+  //   .then((result) => {
+  //     sendOTPVerificationEmail(result, res)
+  // }).catch((err) => {
+  //     console.log(err);
+  //     res.json({
+  //         status: "FAILED",
+  //         message: "An error occured while saving user account!"
+  //     })
+  // })
 
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
@@ -46,7 +46,7 @@ router.post('/register', async (req: Request, res: Response) => {
 });
 
 // Login a user
-export const loginUser = async (req: Request, res: Response) => {
+router.post("/login", async (req: Request, res: Response) => {
   try {
     const { email, password }: { email: string, password: string } = req.body;
 
@@ -62,15 +62,16 @@ export const loginUser = async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    sendOTPVerificationEmail(user, res);
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || '', { expiresIn: '1h' });
+    // const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || '', { expiresIn: '1h' });
 
-    res.status(200).json({ token });
+    res.status(200).json({  message:"User found"});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
-};
+});
 
 // Logout a user
 export const logoutUser = async (req: Request, res: Response) => {
