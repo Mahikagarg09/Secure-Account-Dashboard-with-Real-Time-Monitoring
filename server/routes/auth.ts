@@ -1,10 +1,13 @@
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import { TransportOptions } from 'nodemailer';
 import User from '../models/User';
 import UserOTPVerification from '../models/UserOtpVerification';
+
+dotenv.config();
 
 const router = express.Router();
 
@@ -105,7 +108,7 @@ const sendOTPVerificationEmail = async ({ _id, email }: { _id: string, email: st
           subject: "Verify Your Email",
           html: `<div>
           <h5>Welcome to Oruphones
-          <p>Enter the given <b>${otp}</b>in the app to verify your email adress and complete registration process
+          <p>Enter the given <b>${otp}</b> in the app to verify your email adress and complete registration process
           <p>This code <b>expires in 1 hour</b></p>
           </div>`
       };
@@ -122,19 +125,10 @@ const sendOTPVerificationEmail = async ({ _id, email }: { _id: string, email: st
       console.log("its saved")
       await transporter.sendMail(mailOptions);
       console.log("sent")
-      res.json({
-          status: "PENDING",
-          message: "Verification OTP Email sent",
-          data: {
-              userId: _id,
-              email,
-          },
-      });
+      console.log("Verification OTP Email sent");
   } catch (error) {
-      res.json({
-          status: "FAILED",
-          message: (error as Error).message,
-      });
+    console.error("Failed to send verification email:", error);
+    // Don't send response here, just log the error
   }
 };
 
