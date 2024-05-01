@@ -1,7 +1,34 @@
 "use client"
-import React from 'react'
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react'
 
-export default function page() {
+const Page: React.FC = () => {
+    const [otp, setOtp] = useState<string>("");
+    const [error, setError] = useState<string | null>(null); // State to hold error information
+    const router = useRouter();
+
+    const handleVerify = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const params = new URLSearchParams(window.location.search);
+        const userId = params.get("userId");
+
+        console.log(userId);
+
+        try {
+            const response = await axios.post<{ status: string }>("http://localhost:5500/api/auth/verifyOTP", { userId, otp });
+            console.log(response);
+            const status = response.data.status;
+
+            if (status === 'VERIFIED') {
+                // Navigate to home page after successful verification
+                router.push('/');
+            }
+        } catch (error) {
+            setError(error.response?.data?.message || "An error occurred");
+        }
+    };
   return (
     <div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50 py-12">
             <div className="relative bg-white px-6 pt-10 pb-9 shadow-xl mx-auto w-full max-w-lg rounded-2xl">
@@ -29,7 +56,7 @@ export default function page() {
                                 />
                             </div>
                             <div className="text-center">
-                                <button className="bg-blue-900 text-white w-full max-w-xs mt-5 px-1 py-2 rounded-lg">
+                                <button className="bg-violet-900 text-white w-full max-w-xs mt-5 px-1 py-2 rounded-lg">
                                     Verify
                                 </button>
                             </div>
@@ -45,3 +72,5 @@ export default function page() {
         </div>
   )
 }
+
+export default Page;
