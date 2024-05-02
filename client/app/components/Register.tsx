@@ -5,7 +5,7 @@ import React, { useState } from "react";
 
 const Register: React.FC = () => {
   const router = useRouter();
-  const [name, setName] = useState<string>("");
+  const [username, setusername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -13,13 +13,13 @@ const Register: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!name || !email || !password) {
+    if (!username || !email || !password) {
         setError("All fields are necessary");
         return;
     }
 
     const res = {
-        name,
+        username,
         email,
         password
     };
@@ -31,8 +31,8 @@ const Register: React.FC = () => {
     }
 
     try {
-        const response = await axios.post<{ data: { userId: string } }>("http://localhost:5500/api/auth/register", res);
-        const user_id = response.data.data.userId;
+        const response = await axios.post("http://localhost:5500/api/auth/register", res);
+        // const user_id = response.data.data.userId;
 
         // router.push(`/verify?userId=${user_id}`);
         router.push('/user');
@@ -63,7 +63,7 @@ const Register: React.FC = () => {
             id="name"
             type="text"
             placeholder="Username"
-            onChange={e => setEmail(e.target.value)}
+            onChange={e => setusername(e.target.value)}
           />
         </div>
         <div className="mb-4">
