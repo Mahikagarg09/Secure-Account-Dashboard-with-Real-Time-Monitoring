@@ -3,12 +3,16 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoute from './routes/auth'
+import http from 'http';
+import { Server } from 'socket.io';
 
 dotenv.config();
 
 const app: Application = express();
 
 app.use(express.json());
+const server = http.createServer(app);
+const io = new Server(server);
 
 const PORT: number | string = process.env.PORT || 5500;
 
