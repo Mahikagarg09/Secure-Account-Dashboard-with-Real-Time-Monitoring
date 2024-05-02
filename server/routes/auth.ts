@@ -63,10 +63,14 @@ router.post("/login", async (req: Request, res: Response) => {
     }
 
     sendOTPVerificationEmail(user, res);
+    const userData = {
+      id: user._id,
+      name: user.username,
+      email: user.email,
+    };
+    res.status(200).json(userData);
     // Generate JWT token
     // const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || '', { expiresIn: '1h' });
-
-    res.status(200).json({  message:"User found"});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });

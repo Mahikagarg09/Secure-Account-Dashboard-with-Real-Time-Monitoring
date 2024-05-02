@@ -35,6 +35,7 @@ const Register: React.FC = () => {
         const user_id = response.data.data.userId;
 
         // router.push(`/verify?userId=${user_id}`);
+        router.push('/user');
 
     } catch (error) {
         if (axios.isAxiosError(error)) {

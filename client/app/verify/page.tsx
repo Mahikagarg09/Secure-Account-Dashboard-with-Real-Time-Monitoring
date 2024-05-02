@@ -23,7 +23,8 @@ const Page: React.FC = () => {
 
             if (status === 'VERIFIED') {
                 // Navigate to home page after successful verification
-                router.push('/');
+                console.log("yes")
+                router.push('/user');
             }
         } catch (error) {
             setError(error.response?.data?.message || "An error occurred");
@@ -44,15 +45,15 @@ const Page: React.FC = () => {
 
                     <div>
                         <form 
-                        // onSubmit={handleVerify}
+                        onSubmit={handleVerify}
                         >
                             <div className="form-control w-full max-w-xs m-auto py-3 items-center justify-center text-xl">
                                 <input
                                     type="text"
                                     placeholder="Enter your OTP here"
                                     className="input w-full max-w-xs mb-3 border border-trueGray-900 py-3 text-center"
-                                    // value={otp}
-                                    // onChange={(e) => setOtp(e.target.value)}
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)}
                                 />
                             </div>
                             <div className="text-center">
@@ -62,11 +63,11 @@ const Page: React.FC = () => {
                             </div>
                         </form>
                     </div>
-                    {/* {error && (
+                    {error && (
                         <div className="text-center text-red-500">
                             {error}
                         </div>
-                    )} */}
+                    )}
                 </div>
             </div>
         </div>
