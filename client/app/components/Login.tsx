@@ -3,10 +3,11 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { useAuth } from "./AuthContext";
 
 const Login: React.FC = () => {
-  const router = useRouter();
-
+  // const router = useRouter();
+  const { router } = useAuth();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [err, setErr] = useState<string>("");

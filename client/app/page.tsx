@@ -1,18 +1,15 @@
-"use client"
+import { AuthContextProvider } from "./components/AuthContext";
 
-// Page.tsx
-import { useRouter } from 'next/navigation';
-import AuthContext from "./components/AuthContext";
 import Login from "./components/Login";
 
 export default function Page() {
-  const router = useRouter();
+  // const router = useRouter();
 
   return (
     <>
-      <AuthContext router={router}>
-        <Login />
-      </AuthContext>
+      <AuthContextProvider>
+        <Login/>
+      </AuthContextProvider>
     </>
   );
 }

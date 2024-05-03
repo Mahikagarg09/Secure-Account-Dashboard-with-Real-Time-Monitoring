@@ -26,3 +26,12 @@ mongoose.connect(process.env.DB_CONNECT as string)
 
 app.listen(PORT, () => console.log("server connected"));
 export { io };
+
+
+
+
+//admin dashboard open condition
+//fetch all users info and their devices
+//auth route
+//socket.io
+
