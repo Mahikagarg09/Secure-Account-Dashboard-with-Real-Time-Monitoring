@@ -7,6 +7,7 @@ interface IUser extends Document {
   password: string;
   twoFactorEnabled: boolean;
   loginActivities: Array<{
+    status:string,
     device: string;
     timestamp: Date;
   }>;

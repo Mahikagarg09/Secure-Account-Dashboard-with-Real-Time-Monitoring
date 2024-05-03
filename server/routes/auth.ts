@@ -11,6 +11,48 @@ dotenv.config();
 
 const router = express.Router();
 
+const getDeviceInfo = (userAgent: string): string => {
+  // Check if navigator object is available
+  if (userAgent) {
+    // Check for common keywords to identify the browser and device
+    let browser = "Unknown Browser";
+
+    if (userAgent.match(/Firefox/i)) {
+      browser = 'Firefox';
+    } else if (userAgent.match(/Chrome/i)) {
+      browser = 'Chrome';
+    } else if (userAgent.match(/Safari/i)) {
+      browser = 'Safari';
+    } else if (userAgent.match(/Opera|OPR/i)) {
+      browser = 'Opera';
+    } else if (userAgent.match(/Edge/i)) {
+      browser = 'Edge';
+    } else if (userAgent.match(/MSIE|Trident/i)) {
+      browser = 'Internet Explorer';
+    }
+
+    let device = 'Unknown Device';
+
+    if (userAgent.match(/Android/i)) {
+      device = 'Android Device';
+    } else if (userAgent.match(/iPhone|iPad|iPod/i)) {
+      device = 'iOS Device';
+    } else if (userAgent.match(/Windows Phone/i)) {
+      device = 'Windows Phone';
+    } else if (userAgent.match(/Windows NT/i)) {
+      device = 'Windows PC';
+    } else if (userAgent.match(/Macintosh/i)) {
+      device = 'Macintosh';
+    } else if (userAgent.match(/Linux/i)) {
+      device = 'Linux PC';
+    }
+
+    return ` ${browser}, ${device}`;
+  } else {
+    return "Unknown Device";
+  }
+};
+
 // Register a new user
 router.post('/register', async (req: Request, res: Response) => {
   try {
@@ -26,17 +68,17 @@ router.post('/register', async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create a new user
-    const newUser = new User({ username, email, password: hashedPassword });
+    // const newUser = new User({ username, email, password: hashedPassword });
+    const userAgent: string = req.get('User-Agent') || '';
+    const deviceInfo: string = getDeviceInfo(userAgent);
+    const newUser = new User({
+      username,
+      email,
+      password:hashedPassword,
+      loginActivities: [{ device: deviceInfo, status: "logged in", timestamp: new Date() }]
+    })
+
     await newUser.save()
-  //   .then((result) => {
-  //     sendOTPVerificationEmail(result, res)
-  // }).catch((err) => {
-  //     console.log(err);
-  //     res.json({
-  //         status: "FAILED",
-  //         message: "An error occured while saving user account!"
-  //     })
-  // })
 
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
@@ -169,6 +211,30 @@ router.post("/verifyOTP", async (req: Request, res: Response) => {
             // success
             await User.updateOne({ _id: userId }, { verified: true });
             await UserOTPVerification.deleteMany({ userId });
+            const user = await User.findById(userId);
+            const userAgent: string = req.get('User-Agent') || '';
+            const deviceInfo: string = getDeviceInfo(userAgent);
+            if (user) {
+              // Check if the device already exists in login activities
+              const existingDevice = user.loginActivities.find(activity => activity.device === deviceInfo);
+        
+              if (existingDevice) {
+                // Update the existing device's status and timestamp
+                existingDevice.status = 'Logged in';
+                existingDevice.timestamp = new Date();
+              } else {
+                // Add a new login activity for the device
+                user.loginActivities.push({
+                  device: deviceInfo,
+                  status: 'Logged in',
+                  timestamp: new Date()
+                });
+              }
+        
+              // Save the updated user
+              await user.save();
+            }
+
             res.json({
               status: "VERIFIED",
               message: "User Email verified successfully",
