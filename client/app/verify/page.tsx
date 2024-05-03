@@ -104,7 +104,7 @@ const Page: React.FC = () => {
                                 />
                             </div>
                             <div className="text-center">
-                                <button className="bg-violet-900 text-white w-full max-w-xs mt-5 px-1 py-2 rounded-lg">
+                                <button className="bg-blue-900 text-white w-full max-w-xs mt-5 px-1 py-2 rounded-lg">
                                     Verify
                                 </button>
                             </div>

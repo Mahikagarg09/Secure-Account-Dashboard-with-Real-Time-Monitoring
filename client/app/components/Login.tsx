@@ -47,7 +47,7 @@ const Login: React.FC = () => {
           <p className="mt-5">
             <Link href={`/register`}>
               Already have an account?{" "}
-              <span className="text-violet-900 font-semibold">Sign Up</span>
+              <span className="text-blue-900 font-semibold">Sign Up</span>
             </Link>
           </p>
         </div>
@@ -62,7 +62,7 @@ const Login: React.FC = () => {
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label
-                  className="block text-violet-900 font-bold mb-2 text-xl"
+                  className="block text-blue-900 font-bold mb-2 text-xl"
                   htmlFor="email"
                 >
                   Email
@@ -77,7 +77,7 @@ const Login: React.FC = () => {
               </div>
               <div className="mb-6">
                 <label
-                  className="block text-violet-900 text-xl font-bold mb-2"
+                  className="block text-blue-900 text-xl font-bold mb-2"
                   htmlFor="password"
                 >
                   Password
@@ -92,7 +92,7 @@ const Login: React.FC = () => {
               </div>
               <div className="flex items-center justify-center">
                 <button
-                  className="bg-violet-900 hover:bg-violet-700 text-white text-2xl font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  className="bg-blue-900 hover:bg-blue-700 text-white text-2xl font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                   type="submit"
                 >
                   Sign In
