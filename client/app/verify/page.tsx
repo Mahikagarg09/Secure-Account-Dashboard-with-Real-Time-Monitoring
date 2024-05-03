@@ -24,7 +24,7 @@ const Page: React.FC = () => {
             if (status === 'VERIFIED') {
                 // Navigate to home page after successful verification
                 console.log("yes")
-                router.push('/user');
+                router.push('/dashboard/user');
             }
         } catch (error) {
             setError(error.response?.data?.message || "An error occurred");
