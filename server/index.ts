@@ -25,3 +25,4 @@ mongoose.connect(process.env.DB_CONNECT as string)
   .catch(err => console.log(err));
 
 app.listen(PORT, () => console.log("server connected"));
+export { io };
