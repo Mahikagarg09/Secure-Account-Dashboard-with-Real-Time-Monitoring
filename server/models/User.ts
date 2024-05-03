@@ -34,6 +34,7 @@ const userSchema = new Schema<IUser>({
   },
   loginActivities: [{
     device: String,
+    status:String,
     timestamp: {
       type: Date,
       default: Date.now
