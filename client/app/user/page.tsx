@@ -43,9 +43,9 @@ const Page: React.FC = () => {
             <span className="ml-2">{item.timestamp}</span>
           </div>
           <div className="flex justify-center">
-            <div className="bg-blue-900 text-white mt-4 py-2 px-6 rounded w-full text-center">
+            <button className="bg-blue-900 text-white mt-4 py-2 px-6 rounded w-full text-center">
               Signout
-            </div>
+            </button>
           </div>
         </div>
       ))}
