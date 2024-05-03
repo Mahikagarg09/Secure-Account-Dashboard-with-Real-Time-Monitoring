@@ -8,53 +8,6 @@ const Page: React.FC = () => {
     const [error, setError] = useState<string | null>(null); // State to hold error information
     const router = useRouter();
 
-    // const getDeviceInfo = (): string => {
-    //     // Check if navigator object is available
-    //     if (typeof navigator !== 'undefined') {
-    //       const userAgent = navigator.userAgent;
-      
-    //       // Check for common keywords to identify the browser and device
-    //       let browser = "Unknown Browser";
-      
-    //       if (userAgent.match(/Firefox/i)) {
-    //         browser = 'Firefox';
-    //       } else if (userAgent.match(/Chrome/i)) {
-    //         browser = 'Chrome';
-    //       } else if (userAgent.match(/Safari/i)) {
-    //         browser = 'Safari';
-    //       } else if (userAgent.match(/Opera|OPR/i)) {
-    //         browser = 'Opera';
-    //       } else if (userAgent.match(/Edge/i)) {
-    //         browser = 'Edge';
-    //       } else if (userAgent.match(/MSIE|Trident/i)) {
-    //         browser = 'Internet Explorer';
-    //       }
-      
-    //       let device = 'Unknown Device';
-      
-    //       if (userAgent.match(/Android/i)) {
-    //         device = 'Android Device';
-    //       } else if (userAgent.match(/iPhone|iPad|iPod/i)) {
-    //         device = 'iOS Device';
-    //       } else if (userAgent.match(/Windows Phone/i)) {
-    //         device = 'Windows Phone';
-    //       } else if (userAgent.match(/Windows NT/i)) {
-    //         device = 'Windows PC';
-    //       } else if (userAgent.match(/Macintosh/i)) {
-    //         device = 'Macintosh';
-    //       } else if (userAgent.match(/Linux/i)) {
-    //         device = 'Linux PC';
-    //       }
-      
-    //       return ` ${browser}, ${device}`;
-    //     } else {
-    //       return "Unknown Device";
-    //     }
-    //   };
-      
-    //   const deviceInfo = getDeviceInfo();
-    //   console.log(deviceInfo);
-
     const handleVerify = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
