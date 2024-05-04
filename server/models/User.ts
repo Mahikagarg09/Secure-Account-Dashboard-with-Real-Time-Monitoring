@@ -5,7 +5,6 @@ interface IUser extends Document {
   username: string;
   email: string;
   password: string;
-  twoFactorEnabled: boolean;
   loginActivities: Array<{
     status:string,
     device: string;
@@ -28,10 +27,6 @@ const userSchema = new Schema<IUser>({
   password: {
     type: String,
     required: true
-  },
-  twoFactorEnabled: {
-    type: Boolean,
-    default: false
   },
   loginActivities: [{
     device: String,
