@@ -14,8 +14,6 @@ const Page: React.FC = () => {
         const params = new URLSearchParams(window.location.search);
         const userId = params.get("userId");
 
-        console.log(userId);
-
         try {
             const response = await axios.post<{ status: string }>("http://localhost:5500/api/auth/verifyOTP", { userId, otp });
             console.log(response);
