@@ -6,6 +6,7 @@ interface IUser extends Document {
   email: string;
   password: string;
   loginActivities: Array<{
+    uniqueId:string,
     status:string,
     device: string;
     timestamp: Date;
@@ -29,6 +30,7 @@ const userSchema = new Schema<IUser>({
     required: true
   },
   loginActivities: [{
+    uniqueId:String,
     device: String,
     status:String,
     timestamp: {

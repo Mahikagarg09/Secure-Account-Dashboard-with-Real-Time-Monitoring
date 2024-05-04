@@ -6,52 +6,62 @@ import nodemailer from "nodemailer";
 import { TransportOptions } from "nodemailer";
 import User from "../models/User";
 import UserOTPVerification from "../models/UserOtpVerification";
-
+import crypto from "crypto";
 dotenv.config();
-
 const router = express.Router();
 
-const getDeviceInfo = (userAgent: string): string => {
-  // Check if navigator object is available
-  if (userAgent) {
-    // Check for common keywords to identify the browser and device
-    let browser = "Unknown Browser";
+// Function to generate a unique ID for the device
+function generateDeviceUniqueId(userAgent: string): string {
+  const hash = crypto.createHash("sha256");
+  hash.update(userAgent);
+  // You can include additional device attributes in the hash update if needed
+  // hash.update(ipAddress);
+  // hash.update(deviceType);
+  // hash.update(deviceName);
+  return hash.digest("hex");
+}
 
-    if (userAgent.match(/Firefox/i)) {
-      browser = "Firefox";
-    } else if (userAgent.match(/Chrome/i)) {
-      browser = "Chrome";
-    } else if (userAgent.match(/Safari/i)) {
-      browser = "Safari";
-    } else if (userAgent.match(/Opera|OPR/i)) {
-      browser = "Opera";
-    } else if (userAgent.match(/Edge/i)) {
-      browser = "Edge";
-    } else if (userAgent.match(/MSIE|Trident/i)) {
-      browser = "Internet Explorer";
-    }
+// const getDeviceInfo = (userAgent: string): string => {
+//   // Check if navigator object is available
+//   if (userAgent) {
+//     // Check for common keywords to identify the browser and device
+//     let browser = "Unknown Browser";
 
-    let device = "Unknown Device";
+//     if (userAgent.match(/Firefox/i)) {
+//       browser = "Firefox";
+//     } else if (userAgent.match(/Chrome/i)) {
+//       browser = "Chrome";
+//     } else if (userAgent.match(/Safari/i)) {
+//       browser = "Safari";
+//     } else if (userAgent.match(/Opera|OPR/i)) {
+//       browser = "Opera";
+//     } else if (userAgent.match(/Edge/i)) {
+//       browser = "Edge";
+//     } else if (userAgent.match(/MSIE|Trident/i)) {
+//       browser = "Internet Explorer";
+//     }
 
-    if (userAgent.match(/Android/i)) {
-      device = "Android Device";
-    } else if (userAgent.match(/iPhone|iPad|iPod/i)) {
-      device = "iOS Device";
-    } else if (userAgent.match(/Windows Phone/i)) {
-      device = "Windows Phone";
-    } else if (userAgent.match(/Windows NT/i)) {
-      device = "Windows PC";
-    } else if (userAgent.match(/Macintosh/i)) {
-      device = "Macintosh";
-    } else if (userAgent.match(/Linux/i)) {
-      device = "Linux PC";
-    }
+//     let device = "Unknown Device";
 
-    return ` ${browser}, ${device}`;
-  } else {
-    return "Unknown Device";
-  }
-};
+//     if (userAgent.match(/Android/i)) {
+//       device = "Android Device";
+//     } else if (userAgent.match(/iPhone|iPad|iPod/i)) {
+//       device = "iOS Device";
+//     } else if (userAgent.match(/Windows Phone/i)) {
+//       device = "Windows Phone";
+//     } else if (userAgent.match(/Windows NT/i)) {
+//       device = "Windows PC";
+//     } else if (userAgent.match(/Macintosh/i)) {
+//       device = "Macintosh";
+//     } else if (userAgent.match(/Linux/i)) {
+//       device = "Linux PC";
+//     }
+
+//     return ` ${browser}, ${device}`;
+//   } else {
+//     return "Unknown Device";
+//   }
+// };
 
 // Register a new user
 router.post("/register", async (req: Request, res: Response) => {
@@ -74,16 +84,26 @@ router.post("/register", async (req: Request, res: Response) => {
     // Create a new user
     // const newUser = new User({ username, email, password: hashedPassword });
     const userAgent: string = req.get("User-Agent") || "";
-    const deviceInfo: string = getDeviceInfo(userAgent);
+    const uniqueId: string = generateDeviceUniqueId(userAgent);
+    const parser = require("ua-parser-js");
+    const userAgentData = parser(userAgent);
+    const browserType = userAgentData.browser.name || "Unknown Browser";
+    const deviceType = userAgentData.device.type || "Unknown Device";
+    const deviceInfo = `${browserType},${deviceType}`;
+
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
       loginActivities: [
-        { device: deviceInfo, status: "logged in", timestamp: new Date() },
+        {
+          uniqueId: uniqueId,
+          device: deviceInfo,
+          status: "logged in",
+          timestamp: new Date(),
+        },
       ],
     });
-
     await newUser.save();
 
     res.status(201).json({ message: "User registered successfully" });
@@ -126,15 +146,39 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 // Logout a user
-export const logoutUser = async (req: Request, res: Response) => {
+router.post('/logout', async (req: Request, res: Response) => {
   try {
-    // Implement logout logic as per your requirements
+    const userId = req.body.userId; // Assuming you have middleware to extract user ID from the request
+    const deviceId = req.body.deviceId; // Assuming you're sending device ID in the request body
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find the device in user's login activities
+    const deviceIndex = user.loginActivities.findIndex(
+      (activity) => activity.uniqueId === deviceId
+    );
+
+    if (deviceIndex === -1) {
+      return res.status(404).json({ message: "Device not found" });
+    }
+
+    // Remove the device from user's login activities
+    user.loginActivities.splice(deviceIndex, 1);
+    
+    // Save the updated user
+    await user.save();
+
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
   }
-};
+});
 
 let transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -228,12 +272,19 @@ router.post("/verifyOTP", async (req: Request, res: Response) => {
             await User.updateOne({ _id: userId }, { verified: true });
             await UserOTPVerification.deleteMany({ userId });
             const user = await User.findById(userId);
+
             const userAgent: string = req.get("User-Agent") || "";
-            const deviceInfo: string = getDeviceInfo(userAgent);
+            const uniqueId: string = generateDeviceUniqueId(userAgent);
+            const parser = require("ua-parser-js");
+            const userAgentData = parser(userAgent);
+            const browserType = userAgentData.browser.name || "Unknown Browser";
+            const deviceType = userAgentData.device.type || "Unknown Device";
+            const deviceInfo = `${browserType},${deviceType}`;
+
             if (user) {
               // Check if the device already exists in login activities
               const existingDevice = user.loginActivities.find(
-                (activity) => activity.device === deviceInfo
+                (activity) => activity.uniqueId === deviceInfo
               );
 
               if (existingDevice) {
@@ -243,12 +294,12 @@ router.post("/verifyOTP", async (req: Request, res: Response) => {
               } else {
                 // Add a new login activity for the device
                 user.loginActivities.push({
-                  device: deviceInfo,
+                  uniqueId: uniqueId,
+                  device: deviceInfo, // You can store additional device information if needed
                   status: "Logged in",
                   timestamp: new Date(),
                 });
               }
-
               // Save the updated user
               await user.save();
             }
