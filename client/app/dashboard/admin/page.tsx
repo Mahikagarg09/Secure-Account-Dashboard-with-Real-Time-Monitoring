@@ -1,4 +1,7 @@
 "use client";
+
+import withProtectedRoute from "../../components/withProtectedRoute";
+
 interface listItem {
   username: string;
   useremail: string;
@@ -13,6 +16,9 @@ const listData: listItem[] = [
 const Page: React.FC = () => {
   return (
     <>
+     <div className="text-center font-bold text-5xl my-0 py-14 bg-blue-900 text-white">
+            Manage Access and Devices
+          </div>
       <div className="text-center text-xl mt-8 mb-8 flex justify-center">
         <div className="md:w-[50%]">
           These signed in devices have been currently active on the dashboard.
@@ -49,4 +55,4 @@ const Page: React.FC = () => {
   );
 };
 
-export default Page;
+export default withProtectedRoute(Page);
