@@ -24,7 +24,8 @@ const Page: React.FC = () => {
         // Map login activities to GridItem format
         const gridItems = loginActivities.map((activity: any) => ({
           title: activity.device,
-          timestamp: activity.timestamp,
+          // timestamp: activity.timestamp,
+          timestamp: new Date(activity.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
         }));
         // Update state with login activities data
         setGridData(gridItems);
