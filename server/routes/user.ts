@@ -5,6 +5,26 @@ import Device from '../models/Device';
 
 
 const router = express.Router();
+router.get('/devices', async (req, res) => {
+  try {
+      const uniqueId = req.query.uniqueId; // Get the unique ID from the query parameters
+      if (!uniqueId) {
+          return res.status(400).json({ error: 'Unique ID is required' });
+      }
+      
+      // Check if a device with the provided unique ID exists
+      const device = await Device.findOne({ uniqueId });
+
+      if (!device) {
+          return res.status(404).json({ error: 'Device not found' });
+      }
+
+      return res.status(200).json(device);
+  } catch (error) {
+      console.error('Error fetching devices:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // to get all users data
 router.get('/users', async (req: Request, res: Response) => {
@@ -22,20 +42,20 @@ router.get('/users', async (req: Request, res: Response) => {
     }
   });
 
-  router.get('/devices', async (req, res) => {
-    try {
-        const devices = await Device.find();
+//   router.get('/devices', async (req, res) => {
+//     try {
+//         const devices = await Device.find();
 
-        if (!devices || devices.length === 0) {
-            return res.status(404).json({ error: 'No active devices found' });
-        }
+//         if (!devices || devices.length === 0) {
+//             return res.status(404).json({ error: 'No active devices found' });
+//         }
 
-        return res.status(200).json(devices);
-    } catch (error) {
-        console.error('Error fetching devices:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-});
+//         return res.status(200).json(devices);
+//     } catch (error) {
+//         console.error('Error fetching devices:', error);
+//         return res.status(500).json({ error: 'Internal server error' });
+//     }
+// });
 
 //to get particular user data
 router.get('/:id', async (req: Request, res: Response) => {

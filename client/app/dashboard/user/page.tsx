@@ -1,8 +1,10 @@
 "use client";
 
 // import withProtectedRoute from "../../components/withProtectedRoute";
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import axios from 'axios'; // Import axios for making HTTP requests
+import { useAuth } from '../../components/AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface GridItem {
   title: string;
@@ -10,7 +12,18 @@ interface GridItem {
 }
 
 const Page: React.FC = () => {
+  const auth = useAuth(); // Access auth object from AuthContext
+  const userId = auth?.userId; 
   const [gridData, setGridData] = useState<GridItem[]>([]);
+  const router = useRouter()
+
+  useEffect(() => {
+    // Check if userId is available
+    if (!userId) {
+      // Redirect the user to the homepage or another appropriate page
+      router.push("/");
+      return;
+    }})
 
   useEffect(() => {
     // Retrieve userId from localStorage
