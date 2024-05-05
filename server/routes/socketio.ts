@@ -223,38 +223,33 @@ module.exports = function (io: SocketIOServer) {
     socket.on("getUsers", async () => {
       try {
         const users = await User.find();
-
+  
         if (!users) {
           socket.emit("getUsers:error", "No users found");
           return;
         }
-
+  
         socket.emit("getUsers:success", users);
       } catch (error) {
         console.error("Error fetching users:", error);
         socket.emit("getUsers:error", "Internal server error");
       }
-    });
+    });  
 
     // Event for getting a specific user by ID
-    // Modify your Socket.IO server to handle a new event to fetch login activities
-    socket.on("getLoginActivitiesByUserId", async (userId) => {
+    socket.on("getUserById", async (userId: string) => {
       try {
         const user = await User.findById(userId);
 
         if (!user) {
-          socket.emit("getLoginActivitiesByUserId:error", "User not found");
+          socket.emit("getUserById:error", "User not found");
           return;
         }
 
-        // Emit login activities for the user
-        socket.emit("getLoginActivitiesByUserId:success", user.loginActivities);
+        socket.emit("getUserById:success", user.loginActivities);
       } catch (error) {
-        console.error("Error fetching login activities:", error);
-        socket.emit(
-          "getLoginActivitiesByUserId:error",
-          "Internal server error"
-        );
+        console.error("Error fetching user:", error);
+        socket.emit("getUserById:error", "Internal server error");
       }
     });
 

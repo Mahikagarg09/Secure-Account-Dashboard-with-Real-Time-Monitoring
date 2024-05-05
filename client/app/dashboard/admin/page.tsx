@@ -1,24 +1,45 @@
 "use client";
-
+import React, { useState, useEffect } from "react";
 import withProtectedRoute from "../../components/withProtectedRoute";
+import io from "socket.io-client";
 
-interface listItem {
+interface ListItem {
   username: string;
-  useremail: string;
+  email: string;
 }
 
-const listData: listItem[] = [
-  { username: "User 1", useremail: "abc@gmail.com" },
-  { username: "User 1", useremail: "abc@gmail.com" },
-  { username: "User 1", useremail: "abc@gmail.com" },
-  { username: "User 1", useremail: "abc@gmail.com" },
-];
 const Page: React.FC = () => {
+  const [listData, setListData] = useState<ListItem[]>([]);
+
+  useEffect(() => {
+    const socket = io("http://localhost:5500");
+
+    socket.emit("getUsers"); // Emit event to request users data
+
+    // Define event listeners for success and error responses
+    const handleSuccess = (users: ListItem[]) => {
+      console.log(users);
+      setListData(users);
+    };
+
+    const handleError = (errorMessage: string) => {
+      console.error("Error fetching users:", errorMessage);
+    };
+
+    socket.on("getUsers:success", handleSuccess);
+    socket.on("getUsers:error", handleError);
+
+    // Cleanup function to disconnect socket when component unmounts
+    return () => {
+    };
+  }, []); // Empty dependency array means this effect runs once on component mount
+
+
   return (
     <>
-     <div className="text-center font-bold text-5xl my-0 py-14 bg-blue-900 text-white">
-            Manage Access and Devices
-          </div>
+      <div className="text-center font-bold text-5xl my-0 py-14 bg-blue-900 text-white">
+        Manage Access and Devices
+      </div>
       <div className="text-center text-xl mt-8 mb-8 flex justify-center">
         <div className="md:w-[50%]">
           These signed in devices have been currently active on the dashboard.
@@ -31,15 +52,28 @@ const Page: React.FC = () => {
             <li className="pb-3 sm:pb-4" key={index}>
               <div className="flex items-center space-x-8 rtl:space-x-reverse">
                 <div className="flex-shrink-0">
-                  {/* <img className="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg" alt="Neil image"> */}
-                  <svg className="feather feather-user" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <svg
+                    className="feather feather-user"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
                     {item.username}
                   </p>
                   <p className="text-sm text-gray-500 truncate ">
-                    {item.useremail}
+                    {item.email}
                   </p>
                 </div>
                 <button className="inline-flex items-center text-base font-semibold text-white rounded p-2 bg-blue-900">
@@ -55,4 +89,4 @@ const Page: React.FC = () => {
   );
 };
 
-export default withProtectedRoute(Page);
+export default Page;

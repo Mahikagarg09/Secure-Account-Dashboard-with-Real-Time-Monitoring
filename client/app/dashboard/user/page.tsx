@@ -1,37 +1,11 @@
 "use client";
-import React, { use, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../../components/AuthContext';
-import { io } from 'socket.io-client';
-
-interface GridItem {
-  title: string;
-  timestamp: string;
-}
-
-//MAKE A DUMMY GRID DATA
-const gridData: GridItem[] = [
-  {
-    title: 'Chrome,Desktop',
-    timestamp: '2021-10-01T10:00:00.000Z',
-  },
-  {
-    title: 'Safari,Mobile',
-    timestamp: '2021-10-01T10:00:00.000Z',
-  },
-  {
-    title: 'Firefox,Tablet',
-    timestamp: '2021-10-01T10:00:00.000Z',
-  },
-  {
-    title: 'Edge,Desktop',
-    timestamp: '2021-10-01T10:00:00.000Z',
-  },
-];
+import React, { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { io } from "socket.io-client";
 
 const Page: React.FC = () => {
   const router = useRouter();
-  const [loginActivities, setLoginActivities] = useState<any[]>([]); 
+  const [loginActivities, setLoginActivities] = useState<any[]>([]);
 
   useEffect(() => {
     // Connect to the Socket.IO server
@@ -43,54 +17,30 @@ const Page: React.FC = () => {
       hash.update(userAgent);
       return hash.digest("hex");
     };
+    const fetchUserData = () => {
+      // Calculate unique ID for the device
+      const userAgent = navigator.userAgent || "";
+      const uniqueId = generateDeviceUniqueId(userAgent);
 
-    // Function to fetch user data based on unique device ID
-    // const fetchUserData = () => {
-    //   // Calculate unique ID for the device
-    //   const userAgent = navigator.userAgent || "";
-    //   const uniqueId = generateDeviceUniqueId(userAgent);
+      // Emit event to check if device exists
+      socket.emit("getDeviceByUniqueId", uniqueId);
 
-    //   // Emit event to check if device exists
-    //   socket.emit("getDeviceByUniqueId", uniqueId);
+      // Listen for server response
+      socket.on("getDeviceByUniqueId:success", (device) => {
+        console.log("Device found:", device);
+        socket.emit("getLoginActivitiesByUserId", device.userId);
+      });
 
-    //   // Listen for server response
-    //   socket.on("getDeviceByUniqueId:success", (device) => {
-    //     console.log("Device found:", device);
-    //     // Perform actions based on the retrieved device data
-    //     // For example, update state or display user information
-    //     router.push("/dashboard/user");
-    //   });
-
-    //   socket.on("getDeviceByUniqueId:error", (errorMessage) => {
-    //     console.error(errorMessage);
-    //     router.push("/");
-    //   });
-    // };
-    // Modify your fetchUserData function to fetch both user data and login activities
-const fetchUserData = () => {
-  // Calculate unique ID for the device
-  const userAgent = navigator.userAgent || "";
-  const uniqueId = generateDeviceUniqueId(userAgent);
-
-  // Emit event to check if device exists
-  socket.emit("getDeviceByUniqueId", uniqueId);
-
-  // Listen for server response
-  socket.on("getDeviceByUniqueId:success", (device) => {
-    console.log("Device found:", device);
-    socket.emit("getLoginActivitiesByUserId", device.userId);
-  });
-
-  socket.on("getLoginActivitiesByUserId:success", (loginActivities) => {
-    console.log("Login activities:", loginActivities);
+      socket.on("getLoginActivitiesByUserId:success", (loginActivities) => {
+        console.log("Login activities:", loginActivities);
         setLoginActivities(loginActivities);
-  });
+      });
 
-  socket.on("getDeviceByUniqueId:error", (errorMessage) => {
-    console.error(errorMessage);
-    router.push("/");
-  });
-};
+      socket.on("getDeviceByUniqueId:error", (errorMessage) => {
+        console.error(errorMessage);
+        router.push("/");
+      });
+    };
 
     fetchUserData();
 
@@ -100,7 +50,7 @@ const fetchUserData = () => {
   }, [router]);
 
   const handleSignout = () => {
-    console.log('Signout button clicked');
+    console.log("Signout button clicked");
   };
 
   return (
@@ -117,7 +67,10 @@ const fetchUserData = () => {
       <div className="w-[80%] flex justify-center items-center m-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:w-[70%] w-[80%]">
           {loginActivities.map((item, index) => (
-            <div key={index} className="border border-gray-400 rounded-md p-5 w-full mb-4">
+            <div
+              key={index}
+              className="border border-gray-400 rounded-md p-5 w-full mb-4"
+            >
               <div className="font-bold">{item.device}</div>
               <div className="border border-gray-100 my-2"></div>
               <div className="mb-2">Logged in at</div>
@@ -134,7 +87,10 @@ const fetchUserData = () => {
                 <span className="ml-2">{item.timestamp}</span>
               </div>
               <div className="flex justify-center">
-                <button onClick={handleSignout} className="bg-blue-900 text-white mt-4 py-2 px-6 rounded w-full text-center">
+                <button
+                  onClick={handleSignout}
+                  className="bg-blue-900 text-white mt-4 py-2 px-6 rounded w-full text-center"
+                >
                   Signout
                 </button>
               </div>
@@ -147,4 +103,3 @@ const fetchUserData = () => {
 };
 
 export default Page;
-
