@@ -14,54 +14,8 @@ const router = express.Router();
 function generateDeviceUniqueId(userAgent: string): string {
   const hash = crypto.createHash("sha256");
   hash.update(userAgent);
-  // You can include additional device attributes in the hash update if needed
-  // hash.update(ipAddress);
-  // hash.update(deviceType);
-  // hash.update(deviceName);
   return hash.digest("hex");
 }
-
-// const getDeviceInfo = (userAgent: string): string => {
-//   // Check if navigator object is available
-//   if (userAgent) {
-//     // Check for common keywords to identify the browser and device
-//     let browser = "Unknown Browser";
-
-//     if (userAgent.match(/Firefox/i)) {
-//       browser = "Firefox";
-//     } else if (userAgent.match(/Chrome/i)) {
-//       browser = "Chrome";
-//     } else if (userAgent.match(/Safari/i)) {
-//       browser = "Safari";
-//     } else if (userAgent.match(/Opera|OPR/i)) {
-//       browser = "Opera";
-//     } else if (userAgent.match(/Edge/i)) {
-//       browser = "Edge";
-//     } else if (userAgent.match(/MSIE|Trident/i)) {
-//       browser = "Internet Explorer";
-//     }
-
-//     let device = "Unknown Device";
-
-//     if (userAgent.match(/Android/i)) {
-//       device = "Android Device";
-//     } else if (userAgent.match(/iPhone|iPad|iPod/i)) {
-//       device = "iOS Device";
-//     } else if (userAgent.match(/Windows Phone/i)) {
-//       device = "Windows Phone";
-//     } else if (userAgent.match(/Windows NT/i)) {
-//       device = "Windows PC";
-//     } else if (userAgent.match(/Macintosh/i)) {
-//       device = "Macintosh";
-//     } else if (userAgent.match(/Linux/i)) {
-//       device = "Linux PC";
-//     }
-
-//     return ` ${browser}, ${device}`;
-//   } else {
-//     return "Unknown Device";
-//   }
-// };
 
 // Register a new user
 router.post("/register", async (req: Request, res: Response) => {
