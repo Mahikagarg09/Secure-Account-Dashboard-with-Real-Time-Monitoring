@@ -110,6 +110,7 @@ const Page: React.FC = () => {
         </>
       ) : (
         <>
+        <button className="font-semibold rounded p-2 ml-8 mt-8" onClick={()=> setShow(false)}> ⬅️Back</button>
           <div className="w-[80%] flex justify-center items-center m-auto mt-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:w-[70%] w-[80%]">
               {loginActivities.map((item, index) => (
