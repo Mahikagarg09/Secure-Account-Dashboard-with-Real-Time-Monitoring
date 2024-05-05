@@ -1,9 +1,5 @@
 "use client";
-
-// import withProtectedRoute from "../../components/withProtectedRoute";
 import React, { use, useEffect, useState } from 'react';
-import axios from 'axios'; // Import axios for making HTTP requests
-// import { useAuth } from '../../components/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../components/AuthContext';
 import { io } from 'socket.io-client';
@@ -35,6 +31,7 @@ const gridData: GridItem[] = [
 
 const Page: React.FC = () => {
   const router = useRouter();
+  const [loginActivities, setLoginActivities] = useState<any[]>([]); 
 
   useEffect(() => {
     // Connect to the Socket.IO server
@@ -48,39 +45,61 @@ const Page: React.FC = () => {
     };
 
     // Function to fetch user data based on unique device ID
-    const fetchUserData = () => {
-      // Calculate unique ID for the device
-      const userAgent = navigator.userAgent || "";
-      const uniqueId = generateDeviceUniqueId(userAgent);
+    // const fetchUserData = () => {
+    //   // Calculate unique ID for the device
+    //   const userAgent = navigator.userAgent || "";
+    //   const uniqueId = generateDeviceUniqueId(userAgent);
 
-      // Emit event to check if device exists
-      socket.emit("getDeviceByUniqueId", uniqueId);
+    //   // Emit event to check if device exists
+    //   socket.emit("getDeviceByUniqueId", uniqueId);
 
-      // Listen for server response
-      socket.on("getDeviceByUniqueId:success", (device) => {
-        console.log("Device found:", device);
-        // Perform actions based on the retrieved device data
-        // For example, update state or display user information
-        router.push("/dashboard/user");
-      });
+    //   // Listen for server response
+    //   socket.on("getDeviceByUniqueId:success", (device) => {
+    //     console.log("Device found:", device);
+    //     // Perform actions based on the retrieved device data
+    //     // For example, update state or display user information
+    //     router.push("/dashboard/user");
+    //   });
 
-      socket.on("getDeviceByUniqueId:error", (errorMessage) => {
-        console.error(errorMessage);
-        router.push("/");
-      });
-    };
+    //   socket.on("getDeviceByUniqueId:error", (errorMessage) => {
+    //     console.error(errorMessage);
+    //     router.push("/");
+    //   });
+    // };
+    // Modify your fetchUserData function to fetch both user data and login activities
+const fetchUserData = () => {
+  // Calculate unique ID for the device
+  const userAgent = navigator.userAgent || "";
+  const uniqueId = generateDeviceUniqueId(userAgent);
 
-    // Call the function to fetch user data when the component mounts
+  // Emit event to check if device exists
+  socket.emit("getDeviceByUniqueId", uniqueId);
+
+  // Listen for server response
+  socket.on("getDeviceByUniqueId:success", (device) => {
+    console.log("Device found:", device);
+    socket.emit("getLoginActivitiesByUserId", device.userId);
+  });
+
+  socket.on("getLoginActivitiesByUserId:success", (loginActivities) => {
+    console.log("Login activities:", loginActivities);
+        setLoginActivities(loginActivities);
+  });
+
+  socket.on("getDeviceByUniqueId:error", (errorMessage) => {
+    console.error(errorMessage);
+    router.push("/");
+  });
+};
+
     fetchUserData();
 
-    // Clean up event listeners and socket connection when component unmounts
     return () => {
       socket.disconnect();
     };
   }, [router]);
 
   const handleSignout = () => {
-    // Implement signout functionality here
     console.log('Signout button clicked');
   };
 
@@ -97,9 +116,9 @@ const Page: React.FC = () => {
       </div>
       <div className="w-[80%] flex justify-center items-center m-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:w-[70%] w-[80%]">
-          {gridData.map((item, index) => (
+          {loginActivities.map((item, index) => (
             <div key={index} className="border border-gray-400 rounded-md p-5 w-full mb-4">
-              <div className="font-bold">{item.title}</div>
+              <div className="font-bold">{item.device}</div>
               <div className="border border-gray-100 my-2"></div>
               <div className="mb-2">Logged in at</div>
               <div className="flex items-center">
@@ -129,4 +148,3 @@ const Page: React.FC = () => {
 
 export default Page;
 
-// export default withProtectedRoute(Page);

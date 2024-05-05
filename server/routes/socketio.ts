@@ -64,7 +64,7 @@ module.exports = function (io: SocketIOServer) {
         });
         await newDevice.save();
 
-        socket.emit("register:success","successful registration");
+        socket.emit("register:success", "successful registration");
       } catch (error) {
         console.error(error);
         socket.emit("register:error", "Server Error");
@@ -209,10 +209,7 @@ module.exports = function (io: SocketIOServer) {
                   });
                   await newDevice.save();
                 }
-                socket.emit(
-                  "verifyOTP:success",
-                  "otp verified"
-                );
+                socket.emit("verifyOTP:success", "otp verified");
               }
             }
           }
@@ -240,19 +237,24 @@ module.exports = function (io: SocketIOServer) {
     });
 
     // Event for getting a specific user by ID
-    socket.on("getUserById", async (userId: string) => {
+    // Modify your Socket.IO server to handle a new event to fetch login activities
+    socket.on("getLoginActivitiesByUserId", async (userId) => {
       try {
         const user = await User.findById(userId);
 
         if (!user) {
-          socket.emit("getUserById:error", "User not found");
+          socket.emit("getLoginActivitiesByUserId:error", "User not found");
           return;
         }
 
-        socket.emit("getUserById:success", user);
+        // Emit login activities for the user
+        socket.emit("getLoginActivitiesByUserId:success", user.loginActivities);
       } catch (error) {
-        console.error("Error fetching user:", error);
-        socket.emit("getUserById:error", "Internal server error");
+        console.error("Error fetching login activities:", error);
+        socket.emit(
+          "getLoginActivitiesByUserId:error",
+          "Internal server error"
+        );
       }
     });
 
