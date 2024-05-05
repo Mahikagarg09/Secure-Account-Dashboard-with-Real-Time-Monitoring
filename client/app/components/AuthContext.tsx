@@ -26,10 +26,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   useEffect(() => {
     // Connect to the Socket.IO server
     const socket = io("http://localhost:5500");
-    // if(localStorage.getItem('deviceInfo')){
-    //   router.push('/dashboard/user')
-    // }
-
+  
     // Function to fetch user data based on unique device ID
     const fetchUserData = () => {
       // Calculate unique ID for the device
@@ -48,8 +45,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       socket.on("getDeviceByUniqueId:success", (device) => {
         setDeviceInfo(device);
         console.log("here I saved1")
-        // localStorage.setItem("deviceInfo",device)
-        localStorage.setItem("userId", device.userId);
+        // localStorage.setItem("deviceInfo",device);
         router.push("/dashboard/user");
       });
 

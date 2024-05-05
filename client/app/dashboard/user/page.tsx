@@ -38,7 +38,7 @@ const Page: React.FC = () => {
 
       socket.on("getDeviceByUniqueId:error", (errorMessage) => {
         console.error(errorMessage);
-        router.push("/");
+        // router.push("/");
       });
     };
 

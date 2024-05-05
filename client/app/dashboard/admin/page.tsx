@@ -1,40 +1,57 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import withProtectedRoute from "../../components/withProtectedRoute";
-import io from "socket.io-client";
+import io, { Socket } from "socket.io-client";
 
 interface ListItem {
   username: string;
   email: string;
+  _id: string;
 }
 
 const Page: React.FC = () => {
   const [listData, setListData] = useState<ListItem[]>([]);
+  const [loginActivities, setLoginActivities] = useState<any[]>([]);
+  const [show, setShow] = useState<boolean>(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const socket = io("http://localhost:5500");
+    const newSocket = io("http://localhost:5500");
+    setSocket(newSocket);
 
-    socket.emit("getUsers"); // Emit event to request users data
+    newSocket.emit("getUsers");
 
-    // Define event listeners for success and error responses
-    const handleSuccess = (users: ListItem[]) => {
+    newSocket.on("getUsers:success", (users: ListItem[]) => {
       console.log(users);
       setListData(users);
-    };
+    });
 
-    const handleError = (errorMessage: string) => {
+    newSocket.on("getUsers:error", (errorMessage: string) => {
       console.error("Error fetching users:", errorMessage);
-    };
-
-    socket.on("getUsers:success", handleSuccess);
-    socket.on("getUsers:error", handleError);
+    });
 
     // Cleanup function to disconnect socket when component unmounts
     return () => {
+      newSocket.disconnect();
     };
-  }, []); // Empty dependency array means this effect runs once on component mount
+  }, []);
 
+  const handleDevices = (userId: string) => {
+    setShow(true);
+    if (!socket) return; // Ensure socket is initialized
+    socket.emit("getLoginActivitiesByUserId", userId);
+    console.log(userId)
+    socket.on("getLoginActivitiesByUserId:success", (loginActivities) => {
+      console.log("Login activities:", loginActivities);
+      setLoginActivities(loginActivities);
+    });
 
+    socket.on("getLoginActivitiesByUserId:error", (errorMessage) => {
+      console.error(errorMessage);
+    });
+  };
+  console.log("loginActivitites",loginActivities)
+  console.log("setlistdata", listData);
   return (
     <>
       <div className="text-center font-bold text-5xl my-0 py-14 bg-blue-900 text-white">
@@ -76,7 +93,10 @@ const Page: React.FC = () => {
                     {item.email}
                   </p>
                 </div>
-                <button className="inline-flex items-center text-base font-semibold text-white rounded p-2 bg-blue-900">
+                <button
+                  className="inline-flex items-center text-base font-semibold text-white rounded p-2 bg-blue-900"
+                  onClick={() => handleDevices(item._id)}
+                >
                   Devices
                 </button>
               </div>
