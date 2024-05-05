@@ -5,48 +5,79 @@ import React, { use, useEffect, useState } from 'react';
 import axios from 'axios'; // Import axios for making HTTP requests
 // import { useAuth } from '../../components/AuthContext';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../components/AuthContext';
+import { io } from 'socket.io-client';
 
 interface GridItem {
   title: string;
   timestamp: string;
 }
 
-const Page: React.FC = () => {
-  // const auth = useAuth(); // Access auth object from AuthContext
-  // const userId = auth?.userId; 
-  const [gridData, setGridData] = useState<GridItem[]>([]);
-  const router = useRouter()
+//MAKE A DUMMY GRID DATA
+const gridData: GridItem[] = [
+  {
+    title: 'Chrome,Desktop',
+    timestamp: '2021-10-01T10:00:00.000Z',
+  },
+  {
+    title: 'Safari,Mobile',
+    timestamp: '2021-10-01T10:00:00.000Z',
+  },
+  {
+    title: 'Firefox,Tablet',
+    timestamp: '2021-10-01T10:00:00.000Z',
+  },
+  {
+    title: 'Edge,Desktop',
+    timestamp: '2021-10-01T10:00:00.000Z',
+  },
+];
 
-  // useEffect(() => {
-  //   // Check if userId is available
-  //   if (!userId) {
-  //     // Redirect the user to the homepage or another appropriate page
-  //     router.push("/");
-  //     return;
-  //   }})
+const Page: React.FC = () => {
+  const router = useRouter();
 
   useEffect(() => {
-    // Retrieve userId from localStorage
-    const userId = localStorage.getItem('userId');
+    // Connect to the Socket.IO server
+    const socket = io("http://localhost:5500");
 
-    // Make HTTP request to fetch user's login activities
-    axios.get(`http://localhost:5500/api/user/${userId}`)
-      .then(response => {
-        // Extract login activities from response data
-        const loginActivities = response.data.loginActivities;
-        // Map login activities to GridItem format
-        const gridItems = loginActivities.map((activity: any) => ({
-          title: activity.device,
-          // timestamp: activity.timestamp,
-          timestamp: new Date(activity.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
-        }));
-        // Update state with login activities data
-        setGridData(gridItems);
-      })
-      .catch(error => {
-        console.error('Error fetching login activities:', error);
+    // Function to generate unique device ID
+    const generateDeviceUniqueId = (userAgent: string): string => {
+      const hash = require("crypto").createHash("sha256");
+      hash.update(userAgent);
+      return hash.digest("hex");
+    };
+
+    // Function to fetch user data based on unique device ID
+    const fetchUserData = () => {
+      // Calculate unique ID for the device
+      const userAgent = navigator.userAgent || "";
+      const uniqueId = generateDeviceUniqueId(userAgent);
+
+      // Emit event to check if device exists
+      socket.emit("getDeviceByUniqueId", uniqueId);
+
+      // Listen for server response
+      socket.on("getDeviceByUniqueId:success", (device) => {
+        console.log("Device found:", device);
+        // Perform actions based on the retrieved device data
+        // For example, update state or display user information
+        router.push("/dashboard/user");
       });
-  }, []); // Empty dependency array ensures this effect runs only once
+
+      socket.on("getDeviceByUniqueId:error", (errorMessage) => {
+        console.error(errorMessage);
+        router.push("/");
+      });
+    };
+
+    // Call the function to fetch user data when the component mounts
+    fetchUserData();
+
+    // Clean up event listeners and socket connection when component unmounts
+    return () => {
+      socket.disconnect();
+    };
+  }, [router]);
 
   const handleSignout = () => {
     // Implement signout functionality here

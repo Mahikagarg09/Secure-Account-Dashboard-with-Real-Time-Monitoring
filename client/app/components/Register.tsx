@@ -1,56 +1,70 @@
-"use client";
-import axios from "axios";
+"use client"
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import io from "socket.io-client";
 
 const Register: React.FC = () => {
-  const router = useRouter();
-  const [username, setusername] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const router = useRouter();
+  const socket = io("http://localhost:5500");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!username || !email || !password) {
-        setError("All fields are necessary");
-        return;
-    }
-
-    const res = {
-        username,
-        email,
-        password
+  useEffect(() => {
+    const generateDeviceUniqueId = (userAgent: string): string => {
+      const hash = require("crypto").createHash("sha256");
+      hash.update(userAgent);
+      return hash.digest("hex");
     };
 
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!regex.test(password)) {
-        setError("Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character, and be at least 8 characters long.");
-        return;
-    }
+    const userAgent = navigator.userAgent || "";
+    const parser = require("ua-parser-js");
+    const userAgentData = parser(userAgent);
+    const browserType = userAgentData.browser.name || "Unknown Browser";
+    const deviceType = userAgentData.device.type || "Unknown Device";
+    const deviceInfo = `${browserType},${deviceType}`;
+    const uniqueId = generateDeviceUniqueId(userAgent);
 
-    try {
-        const response = await axios.post("http://localhost:5500/api/auth/register", res);
-        // const user_id = response.data.data.userId;
+    socket.emit("getDeviceByUniqueId", uniqueId);
 
-        // router.push(`/verify?userId=${user_id}`);
-        router.push('dashboard/user');
+    // Listen for server response
+    socket.on("getDeviceByUniqueId:success", (device) => {
+      console.log("Device found:", device);
+      localStorage.setItem("deviceInfo", JSON.stringify(device));
+      localStorage.setItem("userId", device.userId);
+      router.push("/dashboard/user");
+    });
 
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-            console.error("An error occurred while registering:", error.response?.data || error.message);
-        } else {
-            console.error("An error occurred while registering:", error.message);
-        }
-        setError("An error occurred while registering");
-    }
-};
+    socket.on("getDeviceByUniqueId:error", (errorMessage) => {
+      console.error(errorMessage);
+      router.push("/register");
+    });
+
+    return () => {
+    };
+  }, []);
+
+  const handleSubmit = () => {
+    // Emit the registration data to the server
+    socket.emit("register", { username, email, password });
+
+    // Event listener for register:success
+    socket.on("register:success", (message:string) => {
+      console.log("Registration successful:", message);
+      // localStorage.setItem("deviceInfo", JSON.stringify(deviceInfo));
+      router.push("/dashboard/user");
+    });
+
+    // Event listener for register:error
+    socket.on("register:error", (errorMessage: string) => {
+      console.error(errorMessage);
+      setError(errorMessage);
+    });
+  };
   return (
     <div>
-      <form
-      onSubmit={handleSubmit}
-      >
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label
             className="block text-blue-900 font-bold mb-2 text-xl"
@@ -63,7 +77,7 @@ const Register: React.FC = () => {
             id="name"
             type="text"
             placeholder="Username"
-            onChange={e => setusername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
           />
         </div>
         <div className="mb-4">
@@ -78,7 +92,7 @@ const Register: React.FC = () => {
             id="username"
             type="email"
             placeholder="Email"
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="mb-6">
@@ -93,7 +107,7 @@ const Register: React.FC = () => {
             id="password"
             type="password"
             placeholder="Password"
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
         <div className="flex items-center justify-center">
@@ -106,10 +120,12 @@ const Register: React.FC = () => {
         </div>
       </form>
       {error && (
-            <div>
-                <p className="mt-5 text-center text-md font-semibold text-red-500">{error}</p>
-            </div>
-        )}
+        <div>
+          <p className="mt-5 text-center text-md font-semibold text-red-500">
+            {error}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
