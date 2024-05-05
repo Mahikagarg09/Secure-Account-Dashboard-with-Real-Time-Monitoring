@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import { Server as SocketIOServer, Socket } from "socket.io";
 import User from "../models/User";
@@ -65,7 +64,7 @@ module.exports = function (io: SocketIOServer) {
         });
         await newDevice.save();
 
-        socket.emit("register:success", deviceInfo);
+        socket.emit("register:success","successful registration");
       } catch (error) {
         console.error(error);
         socket.emit("register:error", "Server Error");
@@ -212,7 +211,7 @@ module.exports = function (io: SocketIOServer) {
                 }
                 socket.emit(
                   "verifyOTP:success",
-                  deviceInfo
+                  "otp verified"
                 );
               }
             }
