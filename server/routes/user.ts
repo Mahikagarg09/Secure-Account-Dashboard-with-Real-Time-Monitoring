@@ -14,6 +14,8 @@ router.get('/devices', async (req, res) => {
       
       // Check if a device with the provided unique ID exists
       const device = await Device.findOne({ uniqueId });
+      console.log(uniqueId);
+      console.log(device)
 
       if (!device) {
           return res.status(404).json({ error: 'Device not found' });
@@ -42,22 +44,6 @@ router.get('/users', async (req: Request, res: Response) => {
     }
   });
 
-//   router.get('/devices', async (req, res) => {
-//     try {
-//         const devices = await Device.find();
-
-//         if (!devices || devices.length === 0) {
-//             return res.status(404).json({ error: 'No active devices found' });
-//         }
-
-//         return res.status(200).json(devices);
-//     } catch (error) {
-//         console.error('Error fetching devices:', error);
-//         return res.status(500).json({ error: 'Internal server error' });
-//     }
-// });
-
-//to get particular user data
 router.get('/:id', async (req: Request, res: Response) => {
   const userId = req.params.id;
 
