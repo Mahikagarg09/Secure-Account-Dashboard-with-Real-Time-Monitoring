@@ -1,32 +1,52 @@
-import express, { Application, Request, Response } from 'express';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import authRoute from './routes/auth'
-import userRoute from './routes/user'
-import http from 'http';
-import { Server } from 'socket.io';
+import express, { Application, Request, Response } from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors, { CorsOptions } from "cors";
+import authRoute from "./routes/auth";
+import userRoute from "./routes/user";
+import http from "http";
+import { Server } from "socket.io";
 
 dotenv.config();
 
 const app: Application = express();
 
 app.use(express.json());
-const server = http.createServer(app);
-const io = new Server(server);
 
 const PORT: number | string = process.env.PORT || 5500;
 
-app.use(cors());
+const allowedOrigins = ["http://localhost:3000", "http://127.0.0.1:3000"];
+const corsConfigs: CorsOptions = {
+  origin: (origin: string | undefined, callback: (error: Error | null, allowed?: boolean) => void) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Origin not allowed by Cors"));
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
 
-app.use("/api/auth", authRoute);
-app.use("/api/user",userRoute)
+app.use(cors(corsConfigs));
 
-mongoose.connect(process.env.DB_CONNECT as string)
+const server = http.createServer(app);
+const io = new Server(server, {
+  transports: ["websocket","polling"],
+  maxHttpBufferSize: 1e8, // 100 MB we can upload to server (By Default = 1MB)
+  pingTimeout: 60000, // increase the ping timeout
+  cors: { origin: allowedOrigins },
+});
+require("./routes/socketio")(io);
+
+// app.use("/api/auth", authRoute);
+// app.use("/api/user", userRoute);
+
+mongoose
+  .connect(process.env.DB_CONNECT as string)
   .then(() => console.log("Database connected"))
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));
 
-app.listen(PORT, () => console.log("server connected"));
-export { io };
-
-
+server.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
