@@ -1,4 +1,4 @@
-import { AuthProvider } from "./components/AuthContext";
+import AuthContext from "./components/AuthContext";
 
 import Login from "./components/Login";
 
@@ -6,9 +6,9 @@ export default function Page() {
 
   return (
     <>
-      <AuthProvider>
+      <AuthContext>
         <Login/>
-      </AuthProvider>
+      </AuthContext>
     </>
   );
 }
