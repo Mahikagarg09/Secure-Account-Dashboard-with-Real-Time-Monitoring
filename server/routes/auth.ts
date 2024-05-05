@@ -7,6 +7,7 @@ import { TransportOptions } from "nodemailer";
 import User from "../models/User";
 import UserOTPVerification from "../models/UserOtpVerification";
 import crypto from "crypto";
+import Device from "../models/Device";
 dotenv.config();
 const router = express.Router();
 
@@ -59,6 +60,11 @@ router.post("/register", async (req: Request, res: Response) => {
       ],
     });
     await newUser.save();
+    const newDevice = new Device({
+      userId: newUser._id.toString(), // Assuming newUser is the newly registered user
+      uniqueId,
+    });
+    await newDevice.save();
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
@@ -256,8 +262,12 @@ router.post("/verifyOTP", async (req: Request, res: Response) => {
               }
               // Save the updated user
               await user.save();
+              const newDevice = new Device({
+                userId: userId, 
+                uniqueId,
+              });
+              await newDevice.save();
             }
-
             res.json({
               status: "VERIFIED",
               message: "User Email verified successfully",
