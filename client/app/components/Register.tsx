@@ -26,42 +26,42 @@ const Register: React.FC = () => {
     const deviceInfo = `${browserType},${deviceType}`;
     const uniqueId = generateDeviceUniqueId(userAgent);
 
+    const handleSuccess = (device: any) => {
+      console.log("Device found:", device);
+      router.push("/dashboard/user");
+    };
+
+    const handleError = (errorMessage: string) => {
+      console.error(errorMessage);
+      router.push("/register");
+    };
+
     socket.emit("getDeviceByUniqueId", uniqueId);
 
     // Listen for server response
-    socket.on("getDeviceByUniqueId:success", (device) => {
-      console.log("Device found:", device);
-      localStorage.setItem("deviceInfo", JSON.stringify(device));
-      localStorage.setItem("userId", device.userId);
-      router.push("/dashboard/user");
-    });
-
-    socket.on("getDeviceByUniqueId:error", (errorMessage) => {
-      console.error(errorMessage);
-      router.push("/register");
-    });
+    socket.on("getDeviceByUniqueId:success", handleSuccess);
+    socket.on("getDeviceByUniqueId:error", handleError);
 
     return () => {
     };
-  }, []);
+  }, [router, socket]);
 
   const handleSubmit = () => {
     // Emit the registration data to the server
     socket.emit("register", { username, email, password });
 
     // Event listener for register:success
-    socket.on("register:success", (message:string) => {
-      console.log("Registration successful:", message);
-      // localStorage.setItem("deviceInfo", JSON.stringify(deviceInfo));
+    socket.on("register:success",(message:string) => {
+      console.log(message);
       router.push("/dashboard/user");
     });
-
     // Event listener for register:error
-    socket.on("register:error", (errorMessage: string) => {
-      console.error(errorMessage);
-      setError(errorMessage);
+    socket.on("register:error",(message:string) => {
+      console.log(message);
+      // router.push("/dashboard/user");
     });
   };
+
   return (
     <div>
       <form onSubmit={handleSubmit}>

@@ -29,6 +29,7 @@ const Page: React.FC = () => {
       socket.on("getDeviceByUniqueId:success", (device) => {
         console.log("Device found:", device);
         socket.emit("getLoginActivitiesByUserId", device.userId);
+        router.push('/dashboard/user')
       });
 
       socket.on("getLoginActivitiesByUserId:success", (loginActivities) => {
