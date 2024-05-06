@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import withProtectedRoute from "../../components/withProtectedRoute";
 import io, { Socket } from "socket.io-client";
+import { useRouter } from "next/navigation";
 
 interface ListItem {
   username: string;
@@ -14,27 +15,73 @@ const Page: React.FC = () => {
   const [loginActivities, setLoginActivities] = useState<any[]>([]);
   const [show, setShow] = useState<boolean>(false);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const router = useRouter();
   const adminId= process.env.NEXT_PUBLIC_ADMIN_ID
-  console.log("admin",adminId)
-
+  console.log("admin",adminId) // Establish Socket.IO connection
   useEffect(() => {
+    // Establish Socket.IO connection
     const newSocket = io("http://localhost:5500");
     setSocket(newSocket);
 
-    newSocket.emit("getUsers");
+    return () => {
+      // Disconnect socket when component unmounts
+      newSocket.disconnect();
+    };
+}, []);
 
-    newSocket.on("getUsers:success", (users: ListItem[]) => {
+  useEffect(() => {
+    if (!socket) return; // Ensure socket is initialized
+
+    const generateDeviceUniqueId = (userAgent: string): string => {
+      const hash = require("crypto").createHash("sha256");
+      hash.update(userAgent);
+      return hash.digest("hex");
+    };
+
+    const userAgent = navigator.userAgent || "";
+    const parser = require("ua-parser-js");
+    const userAgentData = parser(userAgent);
+    const browserType = userAgentData.browser.name || "Unknown Browser";
+    const deviceType = userAgentData.device.type || "Unknown Device";
+    const deviceInfo = `${browserType},${deviceType}`;
+    const uniqueId = generateDeviceUniqueId(userAgent);
+
+    socket.emit("getDeviceByUniqueId", uniqueId);
+
+    // Listen for server response
+    socket.on("getDeviceByUniqueId:success", (device) => {
+      console.log("Device found:", device);
+      localStorage.setItem("deviceInfo", JSON.stringify(device));
+      localStorage.setItem("userId", device.userId);
+      router.push("/dashboard/admin");
+    });
+
+    socket.on("getDeviceByUniqueId:error", (errorMessage) => {
+      console.error(errorMessage);
+        router.push("/");
+    });
+
+    return () => {
+      // Cleanup function to remove event listeners
+      socket.off("getDeviceByUniqueId:success");
+      socket.off("getDeviceByUniqueId:error");
+    };
+}, [socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.emit("getUsers");
+
+    socket.on("getUsers:success", (users: ListItem[]) => {
       console.log(users);
       setListData(users);
     });
 
-    newSocket.on("getUsers:error", (errorMessage: string) => {
+    socket.on("getUsers:error", (errorMessage: string) => {
       console.error("Error fetching users:", errorMessage);
     });
-
-    // Cleanup function to disconnect socket when component unmounts
     return () => {
-      newSocket.disconnect();
     };
   }, []);
 
