@@ -13,7 +13,7 @@ app.use(express.json());
 
 const PORT: number | string = process.env.PORT || 5500;
 
-const allowedOrigins = ["http://localhost:3000", "http://127.0.0.1:3000"];
+const allowedOrigins = ["http://localhost:3000", "http://127.0.0.1:3000","https://secure-account-dashboard-with-real-time-monitoring.vercel.app/"];
 const corsConfigs: CorsOptions = {
   origin: (origin: string | undefined, callback: (error: Error | null, allowed?: boolean) => void) => {
     if (!origin || allowedOrigins.includes(origin)) {
