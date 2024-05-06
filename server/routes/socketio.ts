@@ -185,7 +185,7 @@ module.exports = function (io: SocketIOServer) {
                 if (user) {
                   // Check if the device already exists in login activities
                   const existingDevice = user.loginActivities.find(
-                    (activity) => activity.uniqueId === deviceInfo
+                    (activity) => activity.uniqueId === uniqueId
                   );
 
                   if (existingDevice) {
