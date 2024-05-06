@@ -15,6 +15,8 @@ const Page: React.FC = () => {
   const [loginActivities, setLoginActivities] = useState<any[]>([]);
   const [show, setShow] = useState<boolean>(false);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [userId, setUserId] = useState<string>("");
+  const[error,setError]=useState<string>("")
   const router = useRouter();
   const adminId= process.env.NEXT_PUBLIC_ADMIN_ID
   useEffect(() => {
@@ -50,8 +52,6 @@ const Page: React.FC = () => {
     // Listen for server response
     socket.on("getDeviceByUniqueId:success", (device) => {
       console.log("Device found:", device);
-      localStorage.setItem("deviceInfo", JSON.stringify(device));
-      localStorage.setItem("userId", device.userId);
       router.push("/dashboard/admin");
     });
 
@@ -86,6 +86,7 @@ const Page: React.FC = () => {
   }, []);
 
   const handleDevices = (userId: string) => {
+    setUserId(userId);
     setShow(true);
     if (!socket) return; // Ensure socket is initialized
     socket.emit("getLoginActivitiesByUserId", userId);
@@ -99,8 +100,24 @@ const Page: React.FC = () => {
       console.error(errorMessage);
     });
   };
-  console.log("loginActivitites", loginActivities);
-  console.log("setlistdata", listData);
+
+  const handleSignout = (uniqueId: string, userId: string): void => {
+    const socket = io("http://localhost:5500");
+    console.log("Signout button clicked", uniqueId, "   ", userId);
+    socket.emit("logout", { userId, deviceId: uniqueId });
+
+    socket.on("logout:success", (message) => {
+      console.log(message);
+      setLoginActivities(prevActivities => prevActivities.filter(activity => activity.uniqueId !== uniqueId));
+      // setError(message)
+    });
+
+    socket.on("logout:error",(message:string) =>{
+      console.log(message);
+      setError(message);
+    })
+  };
+
   return (
     <>
       <div className="text-center font-bold text-5xl my-0 py-14 bg-blue-900 text-white">
@@ -184,7 +201,7 @@ const Page: React.FC = () => {
                   </div>
                   <div className="flex justify-center">
                     <button
-                      // onClick={handleSignout}
+                      onClick={()=>handleSignout(item.uniqueId,userId)}
                       className="bg-blue-900 text-white mt-4 py-2 px-6 rounded w-full text-center"
                     >
                       Signout
