@@ -1,45 +1,4 @@
 "use client";
-// import axios from "axios";
-// import Link from "next/link";
-// import { useRouter } from "next/navigation";
-// import React, { useState } from "react";
-// import { useAuth } from "./AuthContext";
-
-// const Login: React.FC = () => {
-//   const router = useRouter();
-//   const { deviceInfo } = useAuth();
-//   const [email, setEmail] = useState<string>("");
-//   const [password, setPassword] = useState<string>("");
-//   const [err, setErr] = useState<string>("");
-
-// const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-//   e.preventDefault();
-//   if (!email || !password) {
-//     setErr("All fields are necessary");
-//     return;
-//   }
-
-//   try {
-//     const response = await axios.post<string>(
-//       "http://localhost:5500/api/auth/login",
-//       { email, password }
-//     );
-//     console.log(response.data);
-
-//     let userId: any = "";
-//     if (typeof response.data === "object" && response.data !== null) {
-//       userId = (response.data as { id?: string }).id;
-//       localStorage.setItem('userId', userId);
-//     }
-
-//     router.push(`/verify?userId=${userId}`);
-
-//     // router.push('/user/profile');
-//   } catch (error) {
-//     setErr("Invalid email or password");
-//     console.log(err);
-//   }
-// };
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
