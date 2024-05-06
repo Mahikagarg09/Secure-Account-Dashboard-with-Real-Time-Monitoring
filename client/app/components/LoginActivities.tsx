@@ -25,33 +25,25 @@ const LoginActivities: React.FC<Props> = ({ userId }) => {
   }, []);
 
   useEffect(() => {
-    if (!socket) return; // Ensure socket is initialized
-
+    if (!socket) return; 
     socket.emit("getLoginActivitiesByUserId", userId);
-    console.log(userId);
     socket.on("getLoginActivitiesByUserId:success", (loginActivities) => {
-      console.log("Login activities:", loginActivities);
       setLoginActivities(loginActivities);
     });
 
     socket.on("getLoginActivitiesByUserId:error", (errorMessage) => {
-      console.error(errorMessage);
     });
   }, [socket, userId]);
 
   const handleSignout = (uniqueId: string, userId: string): void => {
     const socket = io("http://localhost:5500");
-    console.log("Signout button clicked", uniqueId, "   ", userId);
     socket.emit("logout", { userId, deviceId: uniqueId });
 
     socket.on("logout:success", (message) => {
-      console.log(message);
       setLoginActivities(prevActivities => prevActivities.filter(activity => activity.uniqueId !== uniqueId));
-      // setError(message)
     });
 
     socket.on("logout:error",(message:string) =>{
-      console.log(message);
       setError(message);
     })
   };

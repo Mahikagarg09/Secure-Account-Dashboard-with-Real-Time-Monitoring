@@ -12,16 +12,12 @@ const Login: React.FC = () => {
   const[userId,setUserId]=useState<string>("");
   const[showAdmin,setShowAdmin]=useState<boolean>(false)
   const adminId: string = process.env.NEXT_PUBLIC_ADMIN_ID || "";
-  console.log("adminId", adminId);
   useEffect(() => {  
-    console.log("userId",userId)
     if (userId !== "") {
       if (userId === adminId) {
-        console.log("User is admin");
         setShowAdmin(true)
         router.push("/dashboard/admin");
       } else {
-        console.log("User is not admin");
       }
     }
   }, [userId]);
@@ -33,15 +29,10 @@ const Login: React.FC = () => {
     }
 
     const socket = io("http://localhost:5500");
-    // Emit login event
     socket.emit("login", { email, password });
 
-    // Listen for login success event
-    socket.on("login:success", (userData) => {
-      console.log("Login successful", userData);
+    socket.on("login:success", (userData) => { 
       setUserId(userData.id);
-      console.log("userId in login success",userId)
-      console.log("showAdmin",showAdmin)
       if (showAdmin) {
         router.push("/dashboard/admin");
       } else {
@@ -51,7 +42,6 @@ const Login: React.FC = () => {
 
     // Listen for login error event
     socket.on("login:error", (errorMessage) => {
-      console.error("Login error:", errorMessage);
       setErr(errorMessage);
     });
   };

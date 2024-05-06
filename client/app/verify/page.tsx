@@ -10,26 +10,22 @@ const Page: React.FC = () => {
 
   const handleVerify = () => {
     const socket = io("http://localhost:5500");
-    // Emit verifyOTP event with OTP data to the server
     const params = new URLSearchParams(window.location.search);
     const userId: string | null = params.get("userId");
     socket.emit("verifyOTP", { userId, otp });
 
-    // Listen for server response
     socket.on("verifyOTP:success", (message: string) => {
-      console.log(message);
       router.push("/dashboard/user");
     });
 
     socket.on("verifyOTP:error", (errorMessage: string) => {
-      console.error(errorMessage);
       setError(errorMessage);
     });
   };
 
   const handleFormSubmit = (event) => {
-    event.preventDefault(); // Prevent default form submission
-    handleVerify(); // Call handleVerify function
+    event.preventDefault(); 
+    handleVerify();
   } 
   
   return (

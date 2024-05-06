@@ -23,22 +23,18 @@ const Register: React.FC = () => {
     const userAgentData = parser(userAgent);
     const browserType = userAgentData.browser.name || "Unknown Browser";
     const deviceType = userAgentData.device.type || "Unknown Device";
-    const deviceInfo = `${browserType},${deviceType}`;
     const uniqueId = generateDeviceUniqueId(userAgent);
 
     const handleSuccess = (device: any) => {
-      console.log("Device found:", device);
       router.push("/dashboard/user");
     };
 
     const handleError = (errorMessage: string) => {
-      console.error(errorMessage);
       router.push("/register");
     };
 
     socket.emit("getDeviceByUniqueId", uniqueId);
 
-    // Listen for server response
     socket.on("getDeviceByUniqueId:success", handleSuccess);
     socket.on("getDeviceByUniqueId:error", handleError);
 
@@ -47,19 +43,13 @@ const Register: React.FC = () => {
   }, [router, socket]);
 
   const handleSubmit = () => {
-    // Emit the registration data to the server
     socket.emit("register", { username, email, password });
 
-    // Event listener for register:success
     socket.on("register:success",(message:string) => {
-      console.log(message);
       router.push("/dashboard/user");
     });
-    // Event listener for register:error
     socket.on("register:error",(message:string) => {
       setError(message)
-      console.log(message);
-      // router.push("/dashboard/user");
     });
   };
 

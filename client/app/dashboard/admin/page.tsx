@@ -18,7 +18,6 @@ const Page: React.FC = () => {
   const router = useRouter();
   const adminId= process.env.NEXT_PUBLIC_ADMIN_ID
   useEffect(() => {
-    // Establish Socket.IO connection
     const newSocket = io("http://localhost:5500");
     setSocket(newSocket);
 
@@ -27,7 +26,7 @@ const Page: React.FC = () => {
 }, []);
 
   useEffect(() => {
-    if (!socket) return; // Ensure socket is initialized
+    if (!socket) return;
 
     const generateDeviceUniqueId = (userAgent: string): string => {
       const hash = require("crypto").createHash("sha256");
@@ -40,19 +39,15 @@ const Page: React.FC = () => {
     const userAgentData = parser(userAgent);
     const browserType = userAgentData.browser.name || "Unknown Browser";
     const deviceType = userAgentData.device.type || "Unknown Device";
-    const deviceInfo = `${browserType},${deviceType}`;
     const uniqueId = generateDeviceUniqueId(userAgent);
 
     socket.emit("getDeviceByUniqueId", uniqueId);
 
-    // Listen for server response
     socket.on("getDeviceByUniqueId:success", (device) => {
-      console.log("Device found:", device);
       router.push("/dashboard/admin");
     });
 
     socket.on("getDeviceByUniqueId:error", (errorMessage) => {
-      console.error(errorMessage);
         router.push("/");
     });
 
@@ -61,18 +56,15 @@ const Page: React.FC = () => {
 }, [socket]);
 
   useEffect(() => {
-    // if (!socket) return;
     const socket = io("http://localhost:5500");
 
     socket.emit("getUsers");
 
     socket.on("getUsers:success", (users: ListItem[]) => {
-      console.log("USERS",users);
       setListData(users);
     });
 
     socket.on("getUsers:error", (errorMessage: string) => {
-      console.error("Error fetching users:", errorMessage);
     });
     return () => {
     };
