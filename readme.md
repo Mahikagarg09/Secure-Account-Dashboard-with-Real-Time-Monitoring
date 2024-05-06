@@ -14,22 +14,28 @@ This project aims to create a dynamic chat website.
 
 - Implement user authentication and authorization.
 - Users should be able to log in and log out securely.
-- Implement two-factor authentication (2FA) for additional security.
+- Implement two-factor authentication (2FA) for additional security using otp verification.
+- ![image](https://github.com/Mahikagarg09/Secure-Account-Dashboard-with-Real-Time-Monitoring/assets/98404416/9985ff90-e00e-46db-a88a-80c304cf94dd)
 
 ### User Account Dashboard:
 
 -  Allow users to view their login/logout activities, including device information and timestamps.
 - Implement real-time updates using Socket.IO/Ws for user login/logout activities.
+![image](https://github.com/Mahikagarg09/Secure-Account-Dashboard-with-Real-Time-Monitoring/assets/98404416/19f3c54e-3185-4fc4-886c-9522253d1408)
 
-### Admin Dashboard (Optional But Recommended):
+### Admin Dashboard :
 
 - Create an admin dashboard to monitor user activities.
 - Admins should be able to view user login/logout activities and manage user accounts.
+- ![image](https://github.com/Mahikagarg09/Secure-Account-Dashboard-with-Real-Time-Monitoring/assets/98404416/c166f245-c682-416e-9654-374e6f2eb5d3)
 
 ### Device Management:
 
 - Provide users with the ability to revoke access from specific devices.
 
+## Access Admin Dashboard
+- Email : mahikagarg23@gmail.com
+- password- Test@123
 
 ## Deployment
 
