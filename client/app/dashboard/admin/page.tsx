@@ -17,7 +17,6 @@ const Page: React.FC = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const router = useRouter();
   const adminId= process.env.NEXT_PUBLIC_ADMIN_ID
-  console.log("admin",adminId) // Establish Socket.IO connection
   useEffect(() => {
     // Establish Socket.IO connection
     const newSocket = io("http://localhost:5500");
@@ -25,7 +24,7 @@ const Page: React.FC = () => {
 
     return () => {
       // Disconnect socket when component unmounts
-      newSocket.disconnect();
+      // newSocket.disconnect();
     };
 }, []);
 
@@ -69,12 +68,13 @@ const Page: React.FC = () => {
 }, [socket]);
 
   useEffect(() => {
-    if (!socket) return;
+    // if (!socket) return;
+    const socket = io("http://localhost:5500");
 
     socket.emit("getUsers");
 
     socket.on("getUsers:success", (users: ListItem[]) => {
-      console.log(users);
+      console.log("USERS",users);
       setListData(users);
     });
 
