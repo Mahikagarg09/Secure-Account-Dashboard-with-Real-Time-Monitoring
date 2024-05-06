@@ -56,6 +56,14 @@ const LoginActivities: React.FC<Props> = ({ userId }) => {
     })
   };
 
+  const formatTimestamp = (timestamp: string): string => {
+    const date = new Date(timestamp);
+    const formattedDate = date.toLocaleDateString();
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${formattedDate} ${hours}:${minutes}`;
+  };
+
   return (
     <div className="w-[80%] flex justify-center items-center m-auto mt-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:w-[70%] w-[80%]">
@@ -78,7 +86,7 @@ const LoginActivities: React.FC<Props> = ({ userId }) => {
               >
                 <path d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11zm0 11h6v1h-7v-9h1v8z" />
               </svg>
-              <span className="ml-2">{item.timestamp}</span>
+              <span className="ml-2">{formatTimestamp(item.timestamp)}</span>
             </div>
             <div className="flex justify-center">
               <button
