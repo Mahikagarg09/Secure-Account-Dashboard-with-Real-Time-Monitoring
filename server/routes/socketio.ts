@@ -129,6 +129,7 @@ module.exports = function (io: SocketIOServer) {
 
         // Save the updated user
         await user.save();
+        await Device.deleteOne({ userId, uniqueId: deviceId });
 
         socket.emit("logout:success", "Logout successful");
       } catch (error) {

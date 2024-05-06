@@ -60,6 +60,7 @@ const Page: React.FC = () => {
 
     socket.on("logout:success", (message) => {
       console.log(message);
+      setLoginActivities(prevActivities => prevActivities.filter(activity => activity.uniqueId !== uniqueId));
       // setError(message)
     });
 
