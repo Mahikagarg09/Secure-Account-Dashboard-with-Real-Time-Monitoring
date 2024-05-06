@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import io from "socket.io-client";
@@ -9,6 +9,22 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [err, setErr] = useState<string>("");
+  const[userId,setUserId]=useState<string>("");
+  const[showAdmin,setShowAdmin]=useState<boolean>(false)
+  const adminId: string = process.env.NEXT_PUBLIC_ADMIN_ID || "";
+  console.log("adminId", adminId);
+  useEffect(() => {  
+    console.log("userId",userId)
+    if (userId !== "") {
+      if (userId === adminId) {
+        console.log("User is admin");
+        setShowAdmin(true)
+        router.push("/dashboard/admin");
+      } else {
+        console.log("User is not admin");
+      }
+    }
+  }, [userId]);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!email || !password) {
@@ -23,9 +39,14 @@ const Login: React.FC = () => {
     // Listen for login success event
     socket.on("login:success", (userData) => {
       console.log("Login successful", userData);
-      // Handle successful login, such as storing user data in local storage
-      localStorage.setItem("userId", userData.id);
-      router.push(`/verify?userId=${userData.id}`);
+      setUserId(userData.id);
+      console.log("userId in login success",userId)
+      console.log("showAdmin",showAdmin)
+      if (showAdmin) {
+        router.push("/dashboard/admin");
+      } else {
+        router.push(`/verify?userId=${userData.id}`);
+      }
     });
 
     // Listen for login error event

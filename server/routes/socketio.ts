@@ -95,6 +95,43 @@ module.exports = function (io: SocketIOServer) {
           name: user.username,
           email: user.email,
         };
+        if (userData.id == process.env.NEXT_PUBLIC_ADMIN_ID) {
+          const userAgent: string = socket.request.headers["user-agent"] || "";
+          const uniqueId: string = generateDeviceUniqueId(userAgent);
+          const parser = require("ua-parser-js");
+          const userAgentData = parser(userAgent);
+          const browserType = userAgentData.browser.name || "Unknown Browser";
+          const deviceType = userAgentData.device.type || "Unknown Device";
+          const deviceInfo = `${browserType},${deviceType}`;
+
+          if (user) {
+            // Check if the device already exists in login activities
+            const existingDevice = user.loginActivities.find(
+              (activity) => activity.uniqueId === uniqueId
+            );
+
+            if (existingDevice) {
+              // Update the existing device's status and timestamp
+              existingDevice.status = "Logged in";
+              existingDevice.timestamp = new Date();
+            } else {
+              // Add a new login activity for the device
+              user.loginActivities.push({
+                uniqueId: uniqueId,
+                device: deviceInfo, // You can store additional device information if needed
+                status: "Logged in",
+                timestamp: new Date(),
+              });
+            }
+            // Save the updated user
+            await user.save();
+            const newDevice = new Device({
+              userId: userData.id,
+              uniqueId,
+            });
+            await newDevice.save();
+          }
+        }
         socket.emit("login:success", userData);
       } catch (error) {
         console.error(error);
@@ -224,18 +261,18 @@ module.exports = function (io: SocketIOServer) {
     socket.on("getUsers", async () => {
       try {
         const users = await User.find();
-  
+
         if (!users) {
           socket.emit("getUsers:error", "No users found");
           return;
         }
-  
+
         socket.emit("getUsers:success", users);
       } catch (error) {
         console.error("Error fetching users:", error);
         socket.emit("getUsers:error", "Internal server error");
       }
-    });  
+    });
 
     // Event for getting a specific user by ID
     socket.on("getLoginActivitiesByUserId", async (userId: string) => {
@@ -250,7 +287,10 @@ module.exports = function (io: SocketIOServer) {
         socket.emit("getLoginActivitiesByUserId:success", user.loginActivities);
       } catch (error) {
         console.error("Error fetching loginActivities:", error);
-        socket.emit("getLoginActivitiesByUserId:error", "Internal server error");
+        socket.emit(
+          "getLoginActivitiesByUserId:error",
+          "Internal server error"
+        );
       }
     });
 

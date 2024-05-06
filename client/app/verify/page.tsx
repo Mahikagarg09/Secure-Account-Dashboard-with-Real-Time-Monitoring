@@ -6,24 +6,7 @@ import io from "socket.io-client";;
 const Page: React.FC = () => {
   const [otp, setOtp] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const[showAdmin,setShowAdmin]=useState<boolean>(false)
   const router = useRouter();
-  const adminId: string = process.env.NEXT_PUBLIC_ADMIN_ID || "";
-  console.log("adminId", adminId);
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const userId: string | null = params.get("userId");
-    console.log("userId",userId)
-  
-    if (userId !== null) {
-      if (userId === adminId) {
-        console.log("User is admin");
-        setShowAdmin(true);
-      } else {
-        console.log("User is not admin");
-      }
-    }
-  }, [adminId]); // Re
 
   const handleVerify = () => {
     const socket = io("http://localhost:5500");
@@ -35,12 +18,7 @@ const Page: React.FC = () => {
     // Listen for server response
     socket.on("verifyOTP:success", (message: string) => {
       console.log(message);
-      if (showAdmin) {
-        console.log("INVERIFY",userId);
-        router.push("/dashboard/admin");
-      } else {
-        router.push("/dashboard/user");
-      }
+      router.push("/dashboard/user");
     });
 
     socket.on("verifyOTP:error", (errorMessage: string) => {

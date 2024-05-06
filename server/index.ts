@@ -2,8 +2,6 @@ import express, { Application, Request, Response } from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors, { CorsOptions } from "cors";
-import authRoute from "./routes/auth";
-import userRoute from "./routes/user";
 import http from "http";
 import { Server } from "socket.io";
 
@@ -33,14 +31,11 @@ app.use(cors(corsConfigs));
 const server = http.createServer(app);
 const io = new Server(server, {
   transports: ["websocket","polling"],
-  maxHttpBufferSize: 1e8, // 100 MB we can upload to server (By Default = 1MB)
-  pingTimeout: 60000, // increase the ping timeout
+  maxHttpBufferSize: 1e8, 
+  pingTimeout: 60000, 
   cors: { origin: allowedOrigins },
 });
 require("./routes/socketio")(io);
-
-// app.use("/api/auth", authRoute);
-// app.use("/api/user", userRoute);
 
 mongoose
   .connect(process.env.DB_CONNECT as string)
