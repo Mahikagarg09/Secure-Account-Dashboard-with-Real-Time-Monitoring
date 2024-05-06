@@ -96,6 +96,8 @@ module.exports = function (io: SocketIOServer) {
           email: user.email,
         };
         if (userData.id == process.env.NEXT_PUBLIC_ADMIN_ID) {
+          console.log("saving device")
+          console.log(userData.id == process.env.NEXT_PUBLIC_ADMIN_ID)
           const userAgent: string = socket.request.headers["user-agent"] || "";
           const uniqueId: string = generateDeviceUniqueId(userAgent);
           const parser = require("ua-parser-js");

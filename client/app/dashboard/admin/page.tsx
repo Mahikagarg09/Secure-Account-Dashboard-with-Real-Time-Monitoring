@@ -57,9 +57,6 @@ const Page: React.FC = () => {
     });
 
     return () => {
-      // Cleanup function to remove event listeners
-      socket.off("getDeviceByUniqueId:success");
-      socket.off("getDeviceByUniqueId:error");
     };
 }, [socket]);
 
@@ -124,7 +121,7 @@ const Page: React.FC = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
-                        {item._id==adminId ? 'You' :  item.username}
+                        {item._id==adminId ? 'Admin (You)' :  item.username}
                       </p>
                       <p className="text-sm text-gray-500 truncate ">
                         {item.email}
