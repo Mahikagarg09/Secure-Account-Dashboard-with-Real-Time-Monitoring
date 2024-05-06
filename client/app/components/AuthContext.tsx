@@ -23,7 +23,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   useEffect(() => {
     const socket = io("https://secure-account-dashboard-with-real-time.onrender.com");
-  
+    console.log("socket connected",socket)
     const fetchUserData = () => {
       const userAgent = navigator.userAgent || "";
       const parser = require("ua-parser-js");
