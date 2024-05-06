@@ -23,6 +23,7 @@ const Login: React.FC = () => {
   }, [userId]);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("sign up button clicked")
     if (!email || !password) {
       setErr("All fields are necessary");
       return;
