@@ -47,11 +47,11 @@ const Page: React.FC = () => {
 
   return (
     <>
-      <div className="text-center font-bold text-5xl my-0 py-14 bg-blue-900 text-white">
+      <div className="text-center font-bold text:4xl md:text-5xl py-8 my-0 md:py-14 bg-blue-900 text-white">
         Manage Access and Devices
       </div>
-      <div className="text-center text-xl mt-8 mb-8 flex justify-center">
-        <div className="md:w-[50%]">
+      <div className="text-center mt-8 mb-8 flex justify-center">
+        <div className="w-[90%] md:w-[50%] text-base md:text-xl">
           These signed in devices have been currently active on this account.
           You can sign out any unfamiliar devices.
         </div>

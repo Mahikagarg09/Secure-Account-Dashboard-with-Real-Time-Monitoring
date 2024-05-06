@@ -89,19 +89,19 @@ const Page: React.FC = () => {
 
   return (
     <>
-      <div className="text-center font-bold text-5xl my-0 py-14 bg-blue-900 text-white">
+      <div className="text-center font-bold text:4xl md:text-5xl py-8 my-0 md:py-14 bg-blue-900 text-white">
         Manage Access and Devices
       </div>
       {!show ? (
         <>
-          <div className="text-center text-xl mt-8 mb-8 flex justify-center">
-            <div className="md:w-[50%]">
+          <div className="text-center mt-8 mb-8 flex justify-center">
+            <div className="md:w-[50%] text-sm md:text-xl">
               These signed in devices have been currently active on the
               dashboard. Manage all the users and their devices.
             </div>
           </div>
           <div className="flex justify-center items-center m-auto">
-            <ul className="md:w-[70%] w-[90%]">
+            <ul className="md:w-[70%] w-[80%]">
               {listData.map((item, index) => (
                 <li className="pb-3 sm:pb-4" key={index}>
                   <div className="flex items-center space-x-8 rtl:space-x-reverse">
@@ -131,7 +131,7 @@ const Page: React.FC = () => {
                       </p>
                     </div>
                     <button
-                      className="inline-flex items-center text-base font-semibold text-white rounded p-2 bg-blue-900"
+                      className="inline-flex items-center text-sm md:text-base font-semibold text-white rounded p-2 bg-blue-900"
                       onClick={() => handleDevices(item._id)}
                     >
                       Devices
