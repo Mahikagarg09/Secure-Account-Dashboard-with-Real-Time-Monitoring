@@ -18,7 +18,7 @@ function generateDeviceUniqueId(userAgent: string): string {
 
 module.exports = function (io: SocketIOServer) {
   io.on("connection", (socket: Socket) => {
-    // console.log("A user connected");
+    console.log("A user connected");
 
     // Register event listeners
     socket.on("register", async (userData: any) => {
