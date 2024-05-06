@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import { useAuth } from "../components/AuthContext";
+import { processEnv } from "@next/env";
 
 const Page: React.FC = () => {
   const [otp, setOtp] = useState<string>("");
@@ -53,10 +54,8 @@ const Page: React.FC = () => {
     // Listen for server response
     socket.on("verifyOTP:success", (message:string) => {
       console.log(message);
-    //   localStorage.setItem("deviceInfo", deviceInfo);
-      // setDeviceInfo(data)
-      // Redirect to the user dashboard after successful verification
-      router.push("/dashboard/user");
+        router.push("/dashboard/user");
+      // }
     });
 
     socket.on("verifyOTP:error", (errorMessage: string) => {

@@ -14,6 +14,8 @@ const Page: React.FC = () => {
   const [loginActivities, setLoginActivities] = useState<any[]>([]);
   const [show, setShow] = useState<boolean>(false);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const adminId= process.env.NEXT_PUBLIC_ADMIN_ID
+  console.log("admin",adminId)
 
   useEffect(() => {
     const newSocket = io("http://localhost:5500");
@@ -89,7 +91,7 @@ const Page: React.FC = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
-                        {item.username}
+                        {item._id==adminId ? 'You' :  item.username}
                       </p>
                       <p className="text-sm text-gray-500 truncate ">
                         {item.email}
