@@ -9,7 +9,7 @@ const Page: React.FC = () => {
   const [userId, setUserId] = useState<string>("");
 
   useEffect(() => {
-    const socket = io("http://localhost:5500");
+    const socket = io("https://secure-account-dashboard-with-real-time.onrender.com");
 
     const generateDeviceUniqueId = (userAgent: string): string => {
       const hash = require("crypto").createHash("sha256");

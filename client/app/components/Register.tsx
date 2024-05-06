@@ -9,7 +9,7 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const router = useRouter();
-  const socket = io("http://localhost:5500");
+  const socket = io("https://secure-account-dashboard-with-real-time.onrender.com");
 
   useEffect(() => {
     const generateDeviceUniqueId = (userAgent: string): string => {

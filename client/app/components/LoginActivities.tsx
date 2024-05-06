@@ -36,7 +36,7 @@ const LoginActivities: React.FC<Props> = ({ userId }) => {
   }, [socket, userId]);
 
   const handleSignout = (uniqueId: string, userId: string): void => {
-    const socket = io("http://localhost:5500");
+    const socket = io("https://secure-account-dashboard-with-real-time.onrender.com");
     socket.emit("logout", { userId, deviceId: uniqueId });
 
     socket.on("logout:success", (message) => {

@@ -28,7 +28,7 @@ const Login: React.FC = () => {
       return;
     }
 
-    const socket = io("http://localhost:5500");
+    const socket = io("https://secure-account-dashboard-with-real-time.onrender.com");
     socket.emit("login", { email, password });
 
     socket.on("login:success", (userData) => { 

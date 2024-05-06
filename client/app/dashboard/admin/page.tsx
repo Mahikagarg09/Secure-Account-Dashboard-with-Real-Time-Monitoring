@@ -18,7 +18,7 @@ const Page: React.FC = () => {
   const router = useRouter();
   const adminId= process.env.NEXT_PUBLIC_ADMIN_ID
   useEffect(() => {
-    const newSocket = io("http://localhost:5500");
+    const newSocket = io("https://secure-account-dashboard-with-real-time.onrender.com");
     setSocket(newSocket);
 
     return () => {
@@ -56,7 +56,7 @@ const Page: React.FC = () => {
 }, [socket]);
 
   useEffect(() => {
-    const socket = io("http://localhost:5500");
+    const socket = io("https://secure-account-dashboard-with-real-time.onrender.com");
 
     socket.emit("getUsers");
 

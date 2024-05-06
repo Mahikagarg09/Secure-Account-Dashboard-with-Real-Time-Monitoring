@@ -9,7 +9,7 @@ const Page: React.FC = () => {
   const router = useRouter();
 
   const handleVerify = () => {
-    const socket = io("http://localhost:5500");
+    const socket = io("https://secure-account-dashboard-with-real-time.onrender.com");
     const params = new URLSearchParams(window.location.search);
     const userId: string | null = params.get("userId");
     socket.emit("verifyOTP", { userId, otp });

@@ -22,7 +22,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [deviceInfo, setDeviceInfo] = useState<string | null>(null);
 
   useEffect(() => {
-    const socket = io("http://localhost:5500");
+    const socket = io("https://secure-account-dashboard-with-real-time.onrender.com");
   
     const fetchUserData = () => {
       const userAgent = navigator.userAgent || "";
