@@ -6,6 +6,8 @@ import { io } from "socket.io-client";
 const Page: React.FC = () => {
   const router = useRouter();
   const [loginActivities, setLoginActivities] = useState<any[]>([]);
+  const [error,setError]=useState<string>("")
+  const [userId, setUserId] = useState<string>("");
 
   useEffect(() => {
     // Connect to the Socket.IO server
@@ -29,6 +31,7 @@ const Page: React.FC = () => {
       socket.on("getDeviceByUniqueId:success", (device) => {
         console.log("Device found:", device);
         socket.emit("getLoginActivitiesByUserId", device.userId);
+        setUserId(device.userId);
         router.push('/dashboard/user')
       });
 
@@ -50,8 +53,20 @@ const Page: React.FC = () => {
     };
   }, [router]);
 
-  const handleSignout = () => {
-    console.log("Signout button clicked");
+  const handleSignout = (uniqueId: string, userId: string): void => {
+    const socket = io("http://localhost:5500");
+    console.log("Signout button clicked", uniqueId, "   ", userId);
+    socket.emit("logout", { userId, deviceId: uniqueId });
+
+    socket.on("logout:success", (message) => {
+      console.log(message);
+      // setError(message)
+    });
+
+    socket.on("logout:error",(message:string) =>{
+      console.log(message);
+      setError(message);
+    })
   };
 
   return (
@@ -65,6 +80,9 @@ const Page: React.FC = () => {
           You can sign out any unfamiliar devices.
         </div>
       </div>
+      {error && (
+        <div>{error}</div>
+      )}
       <div className="w-[80%] flex justify-center items-center m-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:w-[70%] w-[80%]">
           {loginActivities.map((item, index) => (
@@ -89,7 +107,7 @@ const Page: React.FC = () => {
               </div>
               <div className="flex justify-center">
                 <button
-                  onClick={handleSignout}
+                  onClick={() => handleSignout(item.uniqueId,userId)}
                   className="bg-blue-900 text-white mt-4 py-2 px-6 rounded w-full text-center"
                 >
                   Signout

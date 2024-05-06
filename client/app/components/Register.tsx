@@ -57,6 +57,7 @@ const Register: React.FC = () => {
     });
     // Event listener for register:error
     socket.on("register:error",(message:string) => {
+      setError(message)
       console.log(message);
       // router.push("/dashboard/user");
     });
